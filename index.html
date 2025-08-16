@@ -8,10 +8,9 @@
 <meta name="theme-color" content="#e41414" />
 
 <style>
-  /* ===== CRM Hacker minimal system ===== */
   :root{
     --bg:#ffffff; --ink:#0b0b0b; --muted:#4b5563; --line:#e5e7eb; --card:#ffffff;
-    --brand:#e41414; --brand-ink:#000; --brand-soft:#ffe5e5;
+    --brand:#e41414; --brand-soft:#ffe5e5;
     --radius:14px; --shadow:0 8px 24px rgba(0,0,0,.06);
   }
   *{box-sizing:border-box}
@@ -24,11 +23,11 @@
   .h2{font-size:clamp(18px,2.5vw,24px);line-height:1.18;margin:0}
   .sub{color:var(--muted);margin:0}
   .btn{display:inline-block;background:var(--brand);color:#fff;border:none;border-radius:12px;padding:10px 16px;font-weight:800;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
-  .btn.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn.secondary{background:#fff;color:#0b0b0b;border:1px solid var(--line)}
   .notice{background:#fafafa;border:1px solid var(--line);border-radius:12px;padding:10px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px}
 
-  /* Sticky Controls Bar */
+  /* Sticky Controls & CTA */
   .topbar{position:sticky;top:0;z-index:60;background:#111;color:#fff;border-bottom:1px solid #000}
   .topbar-inner{max-width:1200px;margin:0 auto;display:flex;gap:12px;align-items:center;justify-content:space-between;padding:8px 12px}
   .bar-left{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -55,15 +54,13 @@
   @media(max-width:679px){.tiles.cols-4{grid-template-columns:1fr}}
   .tile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px}
   .tile h3{font-size:13px;margin:0 0 6px;font-weight:800;letter-spacing:.02em;text-transform:uppercase}
-
   .kv{display:block;border:1px dashed var(--line);padding:6px 8px;border-radius:10px;background:#fff}
   .kv label{display:inline-block;color:var(--muted);font-size:11px;margin-bottom:6px}
   .kv code{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#fcfcfc;border:1px solid var(--line);padding:6px 8px;border-radius:8px;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
-
   .why{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.55}
   .do{font-size:11px;color:#111;margin-top:6px;background:var(--brand-soft);border:1px solid #fbd4d4;padding:8px;border-radius:10px}
 
-  /* Collapsibles (SEO-friendly) */
+  /* Collapsibles */
   details{border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:var(--shadow);padding:8px}
   summary{cursor:pointer;list-style:none;font-weight:900;display:flex;align-items:center;gap:8px}
   summary::-webkit-details-marker{display:none}
@@ -96,9 +93,8 @@
   .sf-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
   @media(max-width:700px){.sf-grid{grid-template-columns:1fr}}
   .sf-field{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}
-  .sf-field label{display:block;font-size:11px;color:#var(--muted);margin-bottom:4px}
+  .sf-field label{display:block;font-size:11px;color:#4b5563;margin-bottom:4px}
 
-  /* Compact full-width Click IDs row */
   .cid-grid{display:grid;gap:8px;grid-template-columns:repeat(5,minmax(140px,1fr))}
   @media (max-width:980px){.cid-grid{grid-template-columns:repeat(3,minmax(140px,1fr))}}
   @media (max-width:640px){.cid-grid{grid-template-columns:repeat(1,minmax(140px,1fr))}}
@@ -118,7 +114,7 @@
       <strong>See ROI in real time</strong>
       <div class="bar-ctrl">
         <label for="roleSelect">Role</label>
-        <select id="roleSelect" class="select">
+        <select id="roleSelect" class="select" aria-label="Select role">
           <option value="marketing">CMO / Marketing</option>
           <option value="sales">Sales Leader</option>
           <option value="revops">RevOps / Ops</option>
@@ -127,7 +123,7 @@
       </div>
       <div class="bar-ctrl">
         <label for="objectSelect">Salesforce Focus</label>
-        <select id="objectSelect" class="select">
+        <select id="objectSelect" class="select" aria-label="Select Salesforce object">
           <option value="lead">Lead</option>
           <option value="cmember">Campaign Member</option>
           <option value="opportunity">Opportunity</option>
@@ -157,9 +153,9 @@
 </header>
 
 <main class="container">
-  <div class="notice">This demo uses public signals (UTMs, referrer, device, IP geo, engagement). Add <code>?demo_enrich=1</code> to simulate firmographics/intent (no paid API).</div>
+  <div class="notice">Public signals only (UTMs, referrer, device, IP geo, engagement). Add <code>?demo_enrich=1</code> to simulate enrichment and intent.</div>
 
-  <!-- ================== OUTCOMES / KPI CARDS ================== -->
+  <!-- KPIs -->
   <section class="section">
     <div class="section-title">
       <div><div class="kicker">Live Results</div><h2 class="h2" id="kpiHeading">What matters for you right now</h2></div>
@@ -169,30 +165,30 @@
         <h3 id="kpi1Title">Primary Channel</h3>
         <div class="kv"><label id="kpi1Label">group</label><code id="campaignGroupTop">—</code></div>
         <p class="why" id="kpi1Why"><strong>Why:</strong> Decide where to spend the next dollar.</p>
-        <div class="do" id="kpi1Do"><strong>Action:</strong> Shift 10–20% from bottom channel to this if its ROI beats median.</div>
+        <div class="do" id="kpi1Do"><strong>Action:</strong> Shift 10–20% toward channels beating median ROI.</div>
       </div>
       <div class="tile">
         <h3 id="kpi2Title">Projected ROI</h3>
         <div class="kv"><label>estimate</label><code id="projSummary">—</code></div>
-        <p class="why" id="kpi2Why"><strong>Why:</strong> Align with Finance on one model: FT/LT/Linear/W.</p>
-        <div class="do" id="kpi2Do"><strong>Action:</strong> Lock the model for the quarter; stop dashboard debates.</div>
+        <p class="why" id="kpi2Why"><strong>Why:</strong> Align with Finance on one model.</p>
+        <div class="do" id="kpi2Do"><strong>Action:</strong> Lock FT/LT/Linear/W for the quarter.</div>
       </div>
       <div class="tile">
         <h3 id="kpi3Title">Visitor Snapshot</h3>
         <div class="kv"><label>device • geo</label><code id="visitorSnap">—</code></div>
-        <p class="why" id="kpi3Why"><strong>Why:</strong> CRO cues + territory routing.</p>
-        <div class="do" id="kpi3Do"><strong>Action:</strong> If Mobile + US, load shorter forms; route to US team.</div>
+        <p class="why" id="kpi3Why"><strong>Why:</strong> CRO cues + routing.</p>
+        <div class="do" id="kpi3Do"><strong>Action:</strong> If Mobile+US, shorten forms and route to US team.</div>
       </div>
       <div class="tile">
         <h3 id="kpi4Title">Engagement</h3>
         <div class="kv"><label>this visit</label><code id="engageSnap">—</code></div>
-        <p class="why" id="kpi4Why"><strong>Why:</strong> Hand-raisers without cookies.</p>
-        <div class="do" id="kpi4Do"><strong>Action:</strong> Trigger SDR alerts on ≥60s time & ≥60% scroll.</div>
+        <p class="why" id="kpi4Why"><strong>Why:</strong> Signals without cookies.</p>
+        <div class="do" id="kpi4Do"><strong>Action:</strong> SDR alert on ≥60s time & ≥60% scroll.</div>
       </div>
     </div>
   </section>
 
-  <!-- ================== QUICK DASHBOARDS ================== -->
+  <!-- Charts -->
   <section class="section">
     <div class="section-title"><div><div class="kicker">Dashboards</div><h2 class="h2">At-a-glance performance</h2></div></div>
     <div class="chart-grid cols-3">
@@ -202,25 +198,20 @@
     </div>
   </section>
 
-  <!-- ================== COLLAPSIBLE DEEP DIVES ================== -->
-
-  <!-- Acquisition -->
+  <!-- Collapsible: Acquisition -->
   <section class="section">
     <details open>
       <summary><span class="kicker">Acquisition & Attribution</span> • Signals that power ROI</summary>
       <div class="collap-body">
         <div class="tiles cols-4" style="margin-top:8px">
-          <div class="tile"><h3>Referrer</h3><div class="kv"><label>value</label><code id="referrer">—</code></div><p class="why"><strong>Why:</strong> Distinguish paid/organic/partner/direct.</p><div class="do"><strong>Action:</strong> Investigate Direct spikes—usually dropped UTMs.</div></div>
+          <div class="tile"><h3>Referrer</h3><div class="kv"><label>value</label><code id="referrer">—</code></div><p class="why"><strong>Why:</strong> Distinguish paid/organic/partner/direct.</p><div class="do"><strong>Action:</strong> Investigate Direct spikes (dropped UTMs).</div></div>
           <div class="tile"><h3>Landing URL</h3><div class="kv"><label>value</label><code id="landingUrl">—</code></div><p class="why"><strong>Why:</strong> Persist UTMs across steps.</p><div class="do"><strong>Action:</strong> Re-append UTMs on form pages.</div></div>
           <div class="tile"><h3>utm_source</h3><div class="kv"><label>value</label><code id="utm_source">—</code></div><p class="why"><strong>Why:</strong> Channel grouping.</p><div class="do"><strong>Action:</strong> Enforce lowercase & whitelist.</div></div>
           <div class="tile"><h3>utm_medium</h3><div class="kv"><label>value</label><code id="utm_medium">—</code></div><p class="why"><strong>Why:</strong> Traffic type.</p><div class="do"><strong>Action:</strong> Normalize (cpc/social/email).</div></div>
-
           <div class="tile"><h3>utm_campaign</h3><div class="kv"><label>value</label><code id="utm_campaign">—</code></div><p class="why"><strong>Why:</strong> Budget/goal unit.</p><div class="do"><strong>Action:</strong> Prefix with channel & quarter.</div></div>
-          <div class="tile"><h3>utm_content</h3><div class="kv"><label>value</label><code id="utm_content">—</code></div><p class="why"><strong>Why:</strong> Creative/variant ID.</p><div class="do"><strong>Action:</strong> Short IDs tied to creative library.</div></div>
+          <div class="tile"><h3>utm_content</h3><div class="kv"><label>value</label><code id="utm_content">—</code></div><p class="why"><strong>Why:</strong> Creative/variant.</p><div class="do"><strong>Action:</strong> Short IDs tied to creative library.</div></div>
           <div class="tile"><h3>utm_term</h3><div class="kv"><label>value</label><code id="utm_term">—</code></div><p class="why"><strong>Why:</strong> Keyword performance.</p><div class="do"><strong>Action:</strong> Negate/expand by ROI.</div></div>
           <div class="tile"><h3>Campaign Group</h3><div class="kv"><label>value</label><code id="campaignGroup">—</code></div><p class="why"><strong>Why:</strong> Quick channel dashboards.</p><div class="do"><strong>Action:</strong> Derive from UTMs/click IDs at capture.</div></div>
-
-          <!-- Click IDs row -->
           <div class="tile" style="grid-column:span 4">
             <h3>Click IDs</h3>
             <div class="cid-grid">
@@ -238,23 +229,23 @@
     </details>
   </section>
 
-  <!-- Device -->
+  <!-- Collapsible: Device -->
   <section class="section">
     <details>
       <summary><span class="kicker">Device & Environment</span> • Context for QA and CRO</summary>
       <div class="collap-body">
         <div class="tiles cols-4" style="margin-top:8px">
           <div class="tile"><h3>Device Type</h3><div class="kv"><label>value</label><code id="deviceType">—</code></div><p class="why"><strong>Why:</strong> Layout & CTA density.</p><div class="do"><strong>Action:</strong> On Mobile, shorten forms, raise CTA frequency.</div></div>
-          <div class="tile"><h3>OS</h3><div class="kv"><label>value</label><code id="os">—</code></div><p class="why"><strong>Why:</strong> QA focus.</p><div class="do"><strong>Action:</strong> Maintain top OS × browser test matrix.</div></div>
+          <div class="tile"><h3>OS</h3><div class="kv"><label>value</label><code id="os">—</code></div><p class="why"><strong>Why:</strong> QA focus.</p><div class="do"><strong>Action:</strong> Maintain top OS×browser test matrix.</div></div>
           <div class="tile"><h3>Browser</h3><div class="kv"><label>value</label><code id="browser">—</code></div><p class="why"><strong>Why:</strong> Rendering quirks.</p><div class="do"><strong>Action:</strong> Validate forms/stickies on Safari.</div></div>
-          <div class="tile"><h3>Screen</h3><div class="kv"><label>value</label><code id="screen">—</code></div><p class="why"><strong>Why:</strong> Above-the-fold decisions.</p><div class="do"><strong>Action:</strong> Keep hero height ≤ 70% of common mobile viewports.</div></div>
+          <div class="tile"><h3>Screen</h3><div class="kv"><label>value</label><code id="screen">—</code></div><p class="why"><strong>Why:</strong> Above-the-fold decisions.</p><div class="do"><strong>Action:</strong> Keep hero ≤70% of common mobile viewports.</div></div>
           <div class="tile" style="grid-column:span 4"><h3>User Agent</h3><div class="kv"><label>value</label><code id="ua">—</code></div><p class="why"><strong>Why:</strong> Debugging context.</p><div class="do"><strong>Action:</strong> Attach UA to error logs.</div></div>
         </div>
       </div>
     </details>
   </section>
 
-  <!-- Geo -->
+  <!-- Collapsible: Geo -->
   <section class="section">
     <details>
       <summary><span class="kicker">Geo & Org</span> • Where this click came from</summary>
@@ -264,14 +255,14 @@
           <div class="tile"><h3>City</h3><div class="kv"><label>value</label><code id="city">—</code></div><p class="why"><strong>Why:</strong> Localization.</p><div class="do"><strong>Action:</strong> Swap social proof by region.</div></div>
           <div class="tile"><h3>Region / State</h3><div class="kv"><label>value</label><code id="region">—</code></div><p class="why"><strong>Why:</strong> Territory routing.</p><div class="do"><strong>Action:</strong> Fallback when form is blank.</div></div>
           <div class="tile"><h3>Country</h3><div class="kv"><label>value</label><code id="country">—</code></div><p class="why"><strong>Why:</strong> Compliance & pricing.</p><div class="do"><strong>Action:</strong> Hide non-eligible SKUs automatically.</div></div>
-          <div class="tile"><h3>Org / ASN</h3><div class="kv"><label>value</label><code id="org">—</code></div><p class="why"><strong>Why:</strong> Sometimes indicates corporate network.</p><div class="do"><strong>Action:</strong> Use as hint only; confirm via enrichment/form domain.</div></div>
-          <div class="tile" style="grid-column:span 4"><h3>Confidence</h3><div class="kv"><label>note</label><code>Org ≈ ISP unless the visitor is on a corporate network.</code></div><div class="do"><strong>Action:</strong> Add a paid enrichment provider when ready; fields already modeled here.</div></div>
+          <div class="tile"><h3>Org / ASN</h3><div class="kv"><label>value</label><code id="org">—</code></div><p class="why"><strong>Why:</strong> Sometimes corporate network.</p><div class="do"><strong>Action:</strong> Use as hint; confirm via enrichment/form domain.</div></div>
+          <div class="tile" style="grid-column:span 4"><h3>Confidence</h3><div class="kv"><label>note</label><code>Org ≈ ISP unless the visitor is on a corporate network.</code></div><div class="do"><strong>Action:</strong> Add paid enrichment later; fields are modeled here.</div></div>
         </div>
       </div>
     </details>
   </section>
 
-  <!-- Engagement -->
+  <!-- Collapsible: Engagement -->
   <section class="section">
     <details>
       <summary><span class="kicker">Engagement</span> • What this visitor did</summary>
@@ -285,7 +276,7 @@
     </details>
   </section>
 
-  <!-- Salesforce Preview -->
+  <!-- Collapsible: Salesforce Preview -->
   <section class="section">
     <details open>
       <summary><span class="kicker">Salesforce Preview</span> • Exactly how this looks in Salesforce</summary>
@@ -395,347 +386,187 @@
     </details>
   </section>
 
-  <!-- Final CTA & utilities -->
+  <!-- CTA + Utilities -->
   <section class="section tiles cols-4">
     <a class="btn" href="https://calendly.com/crmhacker_jonathan" target="_blank" rel="noopener">Book Your ROI Plan</a>
     <button class="btn secondary" id="downloadPdfBtn">Download as PDF</button>
     <a class="btn secondary" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'})">Back to top</a>
   </section>
 
-  <div class="notice">Transparency: This page shows what you can do with free signals and a standard Salesforce setup. We’ll wire enrichment & ad platform feedback loops when you’re ready.</div>
+  <div class="notice">This demo shows what’s possible with free signals + Salesforce. When you’re ready, we’ll integrate enrichment and ad platform feedback loops for closed-loop ROI.</div>
 </main>
 
 <script>
-/* ===== SAFE helpers ===== */
-const SAFE = {
-  $: (id) => document.getElementById(id),
-  set: (id, v) => { const el = SAFE.$(id); if (el) el.textContent = (v ?? "—"); },
-  on: (id, evt, fn) => { const el = SAFE.$(id); if (el) el.addEventListener(evt, fn); },
-  showPane: (idList, targetId) => idList.forEach(id => SAFE.$(id).hidden = (id!==targetId)),
-  warn: (...a) => console.warn("[ROI-DEMO]", ...a)
-};
+/* === helpers === */
+const SAFE={$:id=>document.getElementById(id),set:(id,v)=>{const el=SAFE.$(id);if(el)el.textContent=(v??"—")},on:(id,e,fn)=>{const el=SAFE.$(id);if(el)el.addEventListener(e,fn)},showPane:(ids,t)=>ids.forEach(i=>SAFE.$(i).hidden=(i!==t)),warn:(...a)=>console.warn("[ROI-DEMO]",...a)};
 
-/* ===== Query & persistence ===== */
-const COMMON = ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id","demo_enrich"];
-function parseQuery(){
-  const out={}; const q=location.search.replace(/^\?/,""); if(!q) return out;
-  for(const p of q.split("&")){ if(!p) continue; const [k,v=""]=p.split("="); out[decodeURIComponent(k||"").toLowerCase()] = decodeURIComponent(v||""); }
-  return out;
-}
-function persistParams(){
-  const p=parseQuery(); const prev=JSON.parse(sessionStorage.getItem("params")||"{}"); const next={...prev};
-  for(const k of COMMON) if(p[k]) next[k]=p[k];
-  next.landingUrl = location.href;
-  sessionStorage.setItem("params", JSON.stringify(next));
-  return next;
-}
-function group(params){
-  const s=(params.utm_source||"").toLowerCase(), m=(params.utm_medium||"").toLowerCase();
-  if(params.gclid) return "google-ads";
-  if(params.li_fat_id) return "linkedin-ads";
-  if(params.fbclid) return "meta-ads";
-  if(params.msclkid) return "microsoft-ads";
-  if(s.includes("linkedin")) return "linkedin";
-  if(s.includes("google")) return "google-other";
-  if(!s && !document.referrer) return "direct";
-  return `${s||"unknown"}-${m||"unknown"}`;
-}
+/* === params & grouping === */
+const COMMON=["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id","demo_enrich"];
+function parseQuery(){const out={};const q=location.search.replace(/^\?/,"");if(!q)return out;for(const p of q.split("&")){if(!p)continue;const[k,v=""]=p.split("=");out[decodeURIComponent(k||"").toLowerCase()]=decodeURIComponent(v||"")}return out;}
+function persistParams(){const p=parseQuery();const prev=JSON.parse(sessionStorage.getItem("params")||"{}");const next={...prev};for(const k of COMMON)if(p[k])next[k]=p[k];next.landingUrl=location.href;sessionStorage.setItem("params",JSON.stringify(next));return next;}
+function group(p){const s=(p.utm_source||"").toLowerCase(),m=(p.utm_medium||"").toLowerCase();if(p.gclid)return"google-ads";if(p.li_fat_id)return"linkedin-ads";if(p.fbclid)return"meta-ads";if(p.msclkid)return"microsoft-ads";if(s.includes("linkedin"))return"linkedin";if(s.includes("google"))return"google-other";if(!s&&!document.referrer)return"direct";return`${s||"unknown"}-${m||"unknown"}`}
 
-/* ===== Device & Geo ===== */
-function device(){
-  const ua=navigator.userAgent||"", mobile=/Mobi|Android/i.test(ua);
-  const os=/Windows NT/i.test(ua)?"Windows":/Mac OS X/i.test(ua)?"macOS":/Android/i.test(ua)?"Android":/iPhone|iPad|iPod/i.test(ua)?"iOS":/Linux/i.test(ua)?"Linux":"Other";
-  const browser=/Chrome/i.test(ua)&&!(/Edg/i.test(ua))?"Chrome":/Edg/i.test(ua)?"Edge":/Firefox/i.test(ua)?"Firefox":/Safari/i.test(ua)&&!(/Chrome/i.test(ua))?"Safari":/Opera|OPR/i.test(ua)?"Opera":"Other";
-  return { type: mobile?"Mobile":"Desktop", os, browser, screen:`${screen.width}×${screen.height}`, ua };
-}
-function withTimeout(p,ms=3500){ let t; return Promise.race([p,new Promise((_,rej)=>t=setTimeout(()=>rej(new Error("timeout")),ms))]).finally(()=>clearTimeout(t)); }
-async function ipapi(){ const r=await withTimeout(fetch("https://ipapi.co/json/"),3500); if(!r.ok) throw 0; const j=await r.json(); return{ip:j.ip||null,city:j.city||null,region:j.region||null,country:j.country_name||j.country||null,org:j.org||j.asn||null}; }
-async function ipwho(){ const r=await withTimeout(fetch("https://ipwho.is/"),3500); if(!r.ok) throw 0; const j=await r.json(); if(j&&j.success!==false){ return{ip:j.ip||null,city:j.city||null,region:j.region||null,country:j.country||null,org:j.connection?.org||null}; } throw 0; }
-async function geojs(){ const r=await withTimeout(fetch("https://get.geojs.io/v1/ip/geo.json"),3500); if(!r.ok) throw 0; const j=await r.json(); return{ip:j.ip||null,city:j.city||null,region:j.region||null,country:j.country||null,org:j.organization_name||null}; }
-async function ipify(){ const r=await withTimeout(fetch("https://api.ipify.org?format=json"),3500); if(!r.ok) throw 0; const j=await r.json(); return{ip:j.ip||null,city:null,region:null,country:null,org:null}; }
-async function geo(){ for(const fn of [ipapi,ipwho,geojs,ipify]){ try{ const g=await fn(); if(g) return g; } catch(e){} } return { ip:null, city:null, region:null, country:null, org:null }; }
+/* === device & geo === */
+function device(){const ua=navigator.userAgent||"",mobile=/Mobi|Android/i.test(ua);const os=/Windows NT/i.test(ua)?"Windows":/Mac OS X/i.test(ua)?"macOS":/Android/i.test(ua)?"Android":/iPhone|iPad|iPod/i.test(ua)?"iOS":/Linux/i.test(ua)?"Linux":"Other";const browser=/Chrome/i.test(ua)&&!(/Edg/i.test(ua))?"Chrome":/Edg/i.test(ua)?"Edge":/Firefox/i.test(ua)?"Firefox":/Safari/i.test(ua)&&!(/Chrome/i.test(ua))?"Safari":/Opera|OPR/i.test(ua)?"Opera":"Other";return{type:mobile?"Mobile":"Desktop",os,browser,screen:`${screen.width}×${screen.height}`,ua}}
+function withTimeout(p,ms=3500){let t;return Promise.race([p,new Promise((_,rej)=>t=setTimeout(()=>rej(new Error("timeout")),ms))]).finally(()=>clearTimeout(t))}
+async function ipapi(){const r=await withTimeout(fetch("https://ipapi.co/json/"),3500);if(!r.ok)throw 0;const j=await r.json();return{ip:j.ip||null,city:j.city||null,region:j.region||null,country:j.country_name||j.country||null,org:j.org||j.asn||null}}
+async function ipwho(){const r=await withTimeout(fetch("https://ipwho.is/"),3500);if(!r.ok)throw 0;const j=await r.json();if(j&&j.success!==false){return{ip:j.ip||null,city:j.city||null,region:j.region||null,country:j.country||null,org:j.connection?.org||null}}throw 0}
+async function geojs(){const r=await withTimeout(fetch("https://get.geojs.io/v1/ip/geo.json"),3500);if(!r.ok)throw 0;const j=await r.json();return{ip:j.ip||null,city:j.city||null,region:j.region||null,country:j.country||null,org:j.organization_name||null}}
+async function ipify(){const r=await withTimeout(fetch("https://api.ipify.org?format=json"),3500);if(!r.ok)throw 0;const j=await r.json();return{ip:j.ip||null,city:null,region:null,country:null,org:null}}
+async function geo(){for(const fn of[ipapi,ipwho,geojs,ipify]){try{const g=await fn();if(g)return g}catch(e){}}return{ip:null,city:null,region:null,country:null,org:null}}
 
-/* ===== Session ===== */
+/* === session === */
 const sess={start:Date.now(),scrollMax:0,pageviews:1,timeline:[]};
-(function(){ try{ const k="pv"; const cur=Number(sessionStorage.getItem(k)||"0")+1; sessionStorage.setItem(k,String(cur)); sess.pageviews=cur; }catch(e){} })();
-addEventListener("scroll",()=>{ try{ const d=Math.round(100*(scrollY+innerHeight)/document.body.scrollHeight); sess.scrollMax=Math.min(100,Math.max(sess.scrollMax,d)); }catch(e){} });
-setInterval(()=>{ const t=Math.round((Date.now()-sess.start)/1000); sess.timeline.push({t,depth:sess.scrollMax}); renderSession(); try{ updateEngageChart(); }catch(e){} },1000);
+(function(){try{const k="pv";const cur=Number(sessionStorage.getItem(k)||"0")+1;sessionStorage.setItem(k,String(cur));sess.pageviews=cur}catch(e){}})();
+addEventListener("scroll",()=>{try{const d=Math.round(100*(scrollY+innerHeight)/document.body.scrollHeight);sess.scrollMax=Math.min(100,Math.max(sess.scrollMax,d))}catch(e){}});
+setInterval(()=>{const t=Math.round((Date.now()-sess.start)/1000);sess.timeline.push({t,depth:sess.scrollMax});renderSession();try{updateEngageChart()}catch(e){}},1000);
 
-/* ===== Charts ===== */
-let sourceDonut, deviceBar, engageLine, modelBar, touchDist;
-function initCharts(){
-  if(!window.Chart) return;
-  const red=getComputedStyle(document.documentElement).getPropertyValue('--brand').trim()||'#e41414';
-
-  const sd=SAFE.$('sourceDonut');
-  if(sd){ sourceDonut=new Chart(sd,{type:'doughnut',data:{labels:['google-ads','linkedin-ads','email','direct','other'],datasets:[{data:[0,0,0,0,1],backgroundColor:[red,'#111','#9ca3af','#e5e7eb','#cbd5e1']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},cutout:'60%'}}); }
-
-  const db=SAFE.$('deviceBar');
-  if(db){ deviceBar=new Chart(db,{type:'bar',data:{labels:['Desktop/Windows','Desktop/macOS','Mobile/iOS','Mobile/Android'],datasets:[{label:'This visit',data:[0,0,0,0],backgroundColor:red},{label:'Example mix',data:[35,25,20,20],backgroundColor:'#e5e7eb'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true}}}}); }
-
-  const el=SAFE.$('engageLine');
-  if(el){ engageLine=new Chart(el,{type:'line',data:{labels:[],datasets:[{label:'Depth %',data:[],borderColor:red,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Seconds'}},y:{title:{display:true,text:'Scroll %'},suggestedMin:0,suggestedMax:100}}}}); }
-
-  // Reports charts
-  const mb=SAFE.$('modelBar');
-  if(mb){ modelBar=new Chart(mb,{type:'bar',data:{labels:['FT','LT','Linear','W'],datasets:[{label:'Revenue',data:[10,10,10,10],backgroundColor:red}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}}); }
-  const td=SAFE.$('touchDist');
-  if(td){ touchDist=new Chart(td,{type:'doughnut',data:{labels:['1 touch','2 touches','3+'],datasets:[{data:[60,25,15],backgroundColor:[red,'#111','#9ca3af']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},cutout:'60%'}}); }
+/* === charts === */
+let sourceDonut,deviceBar,engageLine,modelBar,touchDist;
+function initCharts(){if(!window.Chart)return;const red=getComputedStyle(document.documentElement).getPropertyValue('--brand').trim()||'#e41414';
+  const sd=SAFE.$('sourceDonut');if(sd){sourceDonut=new Chart(sd,{type:'doughnut',data:{labels:['google-ads','linkedin-ads','email','direct','other'],datasets:[{data:[0,0,0,0,1],backgroundColor:[red,'#111','#9ca3af','#e5e7eb','#cbd5e1']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},cutout:'60%'}});}
+  const db=SAFE.$('deviceBar');if(db){deviceBar=new Chart(db,{type:'bar',data:{labels:['Desktop/Windows','Desktop/macOS','Mobile/iOS','Mobile/Android'],datasets:[{label:'This visit',data:[0,0,0,0],backgroundColor:red},{label:'Example mix',data:[35,25,20,20],backgroundColor:'#e5e7eb'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true}}}});}
+  const el=SAFE.$('engageLine');if(el){engageLine=new Chart(el,{type:'line',data:{labels:[],datasets:[{label:'Depth %',data:[],borderColor:red,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Seconds'}},y:{title:{display:true,text:'Scroll %'},suggestedMin:0,suggestedMax:100}}}});}
+  const mb=SAFE.$('modelBar');if(mb){modelBar=new Chart(mb,{type:'bar',data:{labels:['FT','LT','Linear','W'],datasets:[{label:'Revenue',data:[10,10,10,10],backgroundColor:red}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});}
+  const td=SAFE.$('touchDist');if(td){touchDist=new Chart(td,{type:'doughnut',data:{labels:['1 touch','2 touches','3+'],datasets:[{data:[60,25,15],backgroundColor:[red,'#111','#9ca3af']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},cutout:'60%'}});}
 }
-function updateEngageChart(){ if(!engageLine) return; const last=sess.timeline[sess.timeline.length-1]; if(!last) return;
-  engageLine.data.labels.push(last.t); engageLine.data.datasets[0].data.push(last.depth);
-  if(engageLine.data.labels.length>60){ engageLine.data.labels.shift(); engageLine.data.datasets[0].data.shift(); }
-  engageLine.update();
-}
+function updateEngageChart(){if(!engageLine)return;const last=sess.timeline[sess.timeline.length-1];if(!last)return;engageLine.data.labels.push(last.t);engageLine.data.datasets[0].data.push(last.depth);if(engageLine.data.labels.length>60){engageLine.data.labels.shift();engageLine.data.datasets[0].data.shift();}engageLine.update()}
 
-/* ===== Rendering ===== */
-function renderAcq(p){
-  SAFE.set("referrer", document.referrer || "(direct / none)");
-  SAFE.set("landingUrl", p.landingUrl || location.href);
-  ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id"].forEach(k => SAFE.set(k, p[k] || "—"));
-  const g = group(p);
-  SAFE.set("campaignGroup", g);
-  SAFE.set("campaignGroupTop", g);
-}
-function renderDev(d){
-  SAFE.set("deviceType",d.type); SAFE.set("os",d.os); SAFE.set("browser",d.browser); SAFE.set("screen",d.screen); SAFE.set("ua",d.ua);
-  SAFE.set("ua_cap",d.ua);
-}
-function renderGeo(g){
-  SAFE.set("ip",g.ip); SAFE.set("city",g.city); SAFE.set("region",g.region); SAFE.set("country",g.country); SAFE.set("org",g.org);
-  SAFE.set("visitorSnap", [g.country||"", g.region||"", g.city||""].filter(Boolean).join(", ") + " • " + (SAFE.$("deviceType")?.textContent||""));
-  SAFE.set("sfIP",g.ip||"—"); SAFE.set("sfCity",g.city||"—"); SAFE.set("sfRegion",g.region||"—"); SAFE.set("sfCountry",g.country||"—"); SAFE.set("sfOrg",g.org||"—");
-}
-function renderSession(){
-  const t=Math.round((Date.now()-sess.start)/1000);
-  SAFE.set("timeOnPage",`${t}s`); SAFE.set("scrollDepth",`${sess.scrollMax}%`); SAFE.set("pageviews",String(sess.pageviews));
-  SAFE.set("engageSnap", `${t}s • ${sess.scrollMax}% • ${sess.pageviews} pv`);
-}
+/* === render core === */
+function renderAcq(p){SAFE.set("referrer",document.referrer||"(direct / none)");SAFE.set("landingUrl",p.landingUrl||location.href);
+  ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id"].forEach(k=>SAFE.set(k,p[k]||"—"));
+  const g=group(p);SAFE.set("campaignGroup",g);SAFE.set("campaignGroupTop",g);}
+function renderDev(d){SAFE.set("deviceType",d.type);SAFE.set("os",d.os);SAFE.set("browser",d.browser);SAFE.set("screen",d.screen);SAFE.set("ua",d.ua);SAFE.set("ua_cap",d.ua);}
+function renderGeo(g){SAFE.set("ip",g.ip);SAFE.set("city",g.city);SAFE.set("region",g.region);SAFE.set("country",g.country);SAFE.set("org",g.org);
+  SAFE.set("visitorSnap",[g.country||"",g.region||"",g.city||""].filter(Boolean).join(", ")+" • "+(SAFE.$("deviceType")?.textContent||""));SAFE.set("sfIP",g.ip||"—");SAFE.set("sfCity",g.city||"—");SAFE.set("sfRegion",g.region||"—");SAFE.set("sfCountry",g.country||"—");SAFE.set("sfOrg",g.org||"—");}
+function renderSession(){const t=Math.round((Date.now()-sess.start)/1000);SAFE.set("timeOnPage",`${t}s`);SAFE.set("scrollDepth",`${sess.scrollMax}%`);SAFE.set("pageviews",String(sess.pageviews));SAFE.set("engageSnap",`${t}s • ${sess.scrollMax}% • ${sess.pageviews} pv`);}
 
-/* ===== PDF ===== */
-SAFE.on("downloadPdfBtn","click",async ()=>{
-  try{
-    if(!window.jspdf||!window.jspdf.jsPDF) throw 0;
-    const el=document.querySelector("main"); const canvas=await html2canvas(el);
-    const img=canvas.toDataURL("image/png"); const { jsPDF }=window.jspdf;
-    const pdf=new jsPDF({orientation:"p",unit:"pt",format:"a4"});
-    const W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight();
-    const m=24,w=W-m*2,ratio=canvas.height/canvas.width,h=w*ratio;
-    pdf.text("CRM Hacker — Real-Time Campaign ROI Demo",m,28);
-    if(h<=H-60){pdf.addImage(img,"PNG",m,40,w,h)}else{const sliceH=H-80;let y=0,p=0;while(y<canvas.height){const c=document.createElement("canvas");c.width=canvas.width;c.height=Math.min(sliceH*canvas.width/w,canvas.height-y);c.getContext("2d").drawImage(canvas,0,y,canvas.width,c.height,0,0,c.width,c.height);const s=c.toDataURL("image/png");if(p>0)pdf.addPage();pdf.addImage(s,"PNG",m,40,w,(c.height/c.width)*w);y+=c.height;p++;}}
-    pdf.save("CRMH_RealTime_ROI_Demo.pdf");
-  }catch(e){SAFE.warn("pdf failed",e)}
-});
+/* === PDF === */
+SAFE.on("downloadPdfBtn","click",async()=>{try{if(!window.jspdf||!window.jspdf.jsPDF)throw 0;const el=document.querySelector("main");const canvas=await html2canvas(el);const img=canvas.toDataURL("image/png");const{jsPDF}=window.jspdf;const pdf=new jsPDF({orientation:"p",unit:"pt",format:"a4"});const W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight();const m=24,w=W-m*2,ratio=canvas.height/canvas.width,h=w*ratio;pdf.text("CRM Hacker — Real-Time Campaign ROI Demo",m,28);if(h<=H-60){pdf.addImage(img,"PNG",m,40,w,h)}else{const sliceH=H-80;let y=0,p=0;while(y<canvas.height){const c=document.createElement("canvas");c.width=canvas.width;c.height=Math.min(sliceH*canvas.width/w,canvas.height-y);c.getContext("2d").drawImage(canvas,0,y,canvas.width,c.height,0,0,c.width,c.height);const s=c.toDataURL("image/png");if(p>0)pdf.addPage();pdf.addImage(s,"PNG",m,40,w,(c.height/c.width)*w);y+=c.height;p++;}}pdf.save("CRMH_RealTime_ROI_Demo.pdf");}catch(e){SAFE.warn("pdf failed",e)}});
 
-/* ===== SF tabs (main panes & sub-tabs) ===== */
+/* === SF tab switching === */
 document.addEventListener("click",(e)=>{
-  const t=e.target.closest(".sf-tab"); if(t){ document.querySelectorAll(".sf-tab").forEach(b=>b.classList.remove("active")); t.classList.add("active");
-    const panes=["leadTab","cmTab","oppTab","reportsTab"]; SAFE.showPane(panes, t.dataset.tab);
-  }
-  const sub=e.target.closest(".sf-tabbtn"); if(sub){ const wrap=sub.closest(".sf-record"); wrap.querySelectorAll(".sf-tabbtn").forEach(x=>x.classList.remove("active")); sub.classList.add("active");
-    wrap.querySelectorAll(".sf-section").forEach(s=>s.hidden=true); const tgt=wrap.querySelector(`#${sub.dataset.tab}`); if(tgt) tgt.hidden=false;
-  }
+  const t=e.target.closest(".sf-tab");if(t){document.querySelectorAll(".sf-tab").forEach(b=>b.classList.remove("active"));t.classList.add("active");SAFE.showPane(["leadTab","cmTab","oppTab","reportsTab"],t.dataset.tab);}
+  const sub=e.target.closest(".sf-tabbtn");if(sub){const wrap=sub.closest(".sf-record");wrap.querySelectorAll(".sf-tabbtn").forEach(x=>x.classList.remove("active"));sub.classList.add("active");wrap.querySelectorAll(".sf-section").forEach(s=>s.hidden=true);const tgt=wrap.querySelector(`#${sub.dataset.tab}`);if(tgt)tgt.hidden=false;}
 });
 
-/* ===== Role & Object profiles ===== */
-const profiles = {
-  marketing: {
-    heroTitle: "Prove & scale campaign ROI.",
-    heroSub: "Channel clarity for budget shifts. See clicks become pipeline and revenue.",
-    kpis: [
-      {title:"Primary Channel", label:"group", why:"Decide where to spend the next dollar.", do:"Shift 10–20% toward channels beating median ROI."},
-      {title:"Projected ROI", label:"estimate", why:"Align with Finance on one model.", do:"Lock FT/LT/Linear/W for the quarter."},
-      {title:"Top Campaign", label:"campaign", why:"Scale winners, cut laggards.", do:"Duplicate winning creative into the next quarter."},
-      {title:"Engagement", label:"this visit", why:"Signals without cookies.", do:"Trigger remarketing after ≥3 pages or ≥60s time."}
-    ],
-    charts: { c1:"Source Grouping", c1sub:"Spend & influence by channel.", c2:"Device & OS", c2sub:"Creative & landing constraints.", c3:"Engagement", c3sub:"Consumption of offer." }
-  },
-  sales: {
-    heroTitle: "See pipeline quality from marketing.",
-    heroSub: "Which channels create meetings and W/L you care about.",
-    kpis: [
-      {title:"Meeting Likelihood", label:"score", why:"High-intent visitors surface first.", do:"Auto-assign if score + territory pass."},
-      {title:"Projected ROI", label:"estimate", why:"Time spent on the right leads.", do:"Hold marketing to opp creation & win rate SLAs."},
-      {title:"Visitor Snapshot", label:"device • geo", why:"Routing & prioritization.", do:"Route to local AEs for same-timezone SLAs."},
-      {title:"Engagement", label:"this visit", why:"Warmer calls.", do:"Nudge when ≥60s & ≥60% scroll."}
-    ],
-    charts: { c1:"Opps by Source", c1sub:"Which channels yield SQLs.", c2:"Device & OS", c2sub:"Call prep context.", c3:"Engagement", c3sub:"Signals to personalize outreach." }
-  },
-  revops: {
-    heroTitle: "One source of truth for attribution.",
-    heroSub: "Field mapping, governance, and influence—all consistent.",
-    kpis: [
-      {title:"Primary Channel", label:"group", why:"Downstream reporting consistency.", do:"Normalize UTMs at capture; enforce picklists."},
-      {title:"Projected ROI", label:"estimate", why:"Planning & reforecasting.", do:"Publish BI dashboards from the same model."},
-      {title:"Data Completeness", label:"coverage", why:"Audit health.", do:"Alert when UTMs / click IDs missing."},
-      {title:"Engagement", label:"this visit", why:"Scoring inputs.", do:"Add time/scroll to MQ scoring logic."}
-    ],
-    charts: { c1:"Channel Completeness", c1sub:"Coverage of UTMs/click IDs.", c2:"Device & OS", c2sub:"Edge-case QA buckets.", c3:"Engagement", c3sub:"Score inputs & thresholds." }
-  },
-  exec: {
-    heroTitle: "Marketing dollars to booked revenue.",
-    heroSub: "Simple, credible ROI that Finance signs off on.",
-    kpis: [
-      {title:"Primary Channel", label:"group", why:"Where money works.", do:"Reallocate budget weekly by ROI trend."},
-      {title:"Projected ROI", label:"estimate", why:"Confidence to scale spend.", do:"Double top channel when CAC/LTV holds."},
-      {title:"Pipeline from Click", label:"$", why:"What this visit could create.", do:"Target payback windows by segment."},
-      {title:"Engagement", label:"this visit", why:"Intent now.", do:"Enable SDR follow-up while hot."}
-    ],
-    charts: { c1:"Revenue by Source", c1sub:"What moved the needle.", c2:"Device & OS", c2sub:"Just context.", c3:"Engagement", c3sub:"Confidence the visitor is real." }
-  }
+/* === Role & Object profiles (drives picklists) === */
+const profiles={
+  marketing:{heroTitle:"Prove & scale campaign ROI.",heroSub:"Channel clarity for budget shifts. See clicks become pipeline and revenue.",
+    kpis:[{title:"Primary Channel",why:"Decide where to spend the next dollar.",do:"Shift 10–20% toward channels beating median ROI."},
+          {title:"Projected ROI",why:"Align with Finance on one model.",do:"Lock FT/LT/Linear/W for the quarter."},
+          {title:"Top Campaign",why:"Scale winners, cut laggards.",do:"Duplicate winning creative into next quarter."},
+          {title:"Engagement",why:"Signals without cookies.",do:"Trigger remarketing after ≥3 pages or ≥60s."}],
+    charts:{c1:"Source Grouping",c1sub:"Spend & influence by channel.",c2:"Device & OS",c2sub:"Creative & landing constraints.",c3:"Engagement",c3sub:"Offer consumption."}},
+  sales:{heroTitle:"See pipeline quality from marketing.",heroSub:"Which channels create meetings and wins you care about.",
+    kpis:[{title:"Meeting Likelihood",why:"High-intent visitors first.",do:"Auto-assign if score + territory pass."},
+          {title:"Projected ROI",why:"Time on the right leads.",do:"Hold marketing to opp creation & win-rate SLAs."},
+          {title:"Visitor Snapshot",why:"Routing & prioritization.",do:"Route to local AEs for timezone SLAs."},
+          {title:"Engagement",why:"Warmer calls.",do:"Nudge when ≥60s & ≥60% scroll."}],
+    charts:{c1:"Opps by Source",c1sub:"Which channels yield SQLs.",c2:"Device & OS",c2sub:"Call prep context.",c3:"Engagement",c3sub:"Signals to personalize outreach."}},
+  revops:{heroTitle:"One source of truth for attribution.",heroSub:"Field mapping, governance, and influence—all consistent.",
+    kpis:[{title:"Primary Channel",why:"Downstream reporting consistency.",do:"Normalize UTMs at capture; enforce picklists."},
+          {title:"Projected ROI",why:"Planning & reforecasting.",do:"Publish BI dashboards from the same model."},
+          {title:"Data Completeness",why:"Audit health.",do:"Alert when UTMs / click IDs missing."},
+          {title:"Engagement",why:"Scoring inputs.",do:"Add time/scroll to MQ scoring."}],
+    charts:{c1:"Channel Completeness",c1sub:"Coverage of UTMs/click IDs.",c2:"Device & OS",c2sub:"Edge-case QA buckets.",c3:"Engagement",c3sub:"Score inputs & thresholds."}},
+  exec:{heroTitle:"Marketing dollars to booked revenue.",heroSub:"Simple, credible ROI that Finance signs off on.",
+    kpis:[{title:"Primary Channel",why:"Where money works.",do:"Reallocate weekly by ROI trend."},
+          {title:"Projected ROI",why:"Confidence to scale spend.",do:"Double top channel when CAC/LTV holds."},
+          {title:"Pipeline from Click",why:"What this visit could create.",do:"Target payback windows by segment."},
+          {title:"Engagement",why:"Intent now.",do:"Enable SDR follow-up while hot."}],
+    charts:{c1:"Revenue by Source",c1sub:"What moved the needle.",c2:"Device & OS",c2sub:"Context only.",c3:"Engagement",c3sub:"Confidence the visitor is real."}}
 };
 
-const objectViews = {
-  lead: { sfPane:"leadTab",  kpiHeading:"What matters at Lead",  chart1:"Source Grouping", chart2:"Device & OS", chart3:"Engagement (this visit)" },
-  cmember: { sfPane:"cmTab", kpiHeading:"What matters at Campaign Member", chart1:"Touch Role & %", chart2:"Device & OS", chart3:"Engagement (touch)" },
-  opportunity: { sfPane:"oppTab", kpiHeading:"What matters at Opportunity", chart1:"Influence by Source", chart2:"Device & OS", chart3:"Engagement→Stage" },
-  reports: { sfPane:"reportsTab", kpiHeading:"What matters in Reports & ROI", chart1:"Revenue by Source", chart2:"Model Mix", chart3:"Touches per Opp" }
+const objectViews={
+  lead:{sfPane:"leadTab",kpiHeading:"What matters at Lead",chart1:"Source Grouping",chart2:"Device & OS",chart3:"Engagement (this visit)"},
+  cmember:{sfPane:"cmTab",kpiHeading:"What matters at Campaign Member",chart1:"Touch Role & %",chart2:"Device & OS",chart3:"Engagement (touch)"},
+  opportunity:{sfPane:"oppTab",kpiHeading:"What matters at Opportunity",chart1:"Influence by Source",chart2:"Device & OS",chart3:"Engagement→Stage"},
+  reports:{sfPane:"reportsTab",kpiHeading:"What matters in Reports & ROI",chart1:"Revenue by Source",chart2:"Model Mix",chart3:"Touches per Opp"}
 };
 
 function applyRole(roleKey){
-  const p = profiles[roleKey] || profiles.marketing;
-  SAFE.set("heroTitle", p.heroTitle);
-  SAFE.set("heroSub", p.heroSub);
-
-  // KPI titles/why/do
-  const ids = [
-    ["kpi1Title","kpi1Why","kpi1Do"],["kpi2Title","kpi2Why","kpi2Do"],
-    ["kpi3Title","kpi3Why","kpi3Do"],["kpi4Title","kpi4Why","kpi4Do"]
-  ];
-  p.kpis.forEach((k, i)=>{
-    SAFE.set(ids[i][0], k.title);
-    SAFE.set(ids[i][1], `Why: ${k.why}`);
-    SAFE.set(ids[i][2], `Action: ${k.do}`);
-  });
-
-  // Chart captions (we keep same charts but update labels)
-  SAFE.set("chart1Title", p.charts.c1);
-  SAFE.set("chart1Sub", p.charts.c1sub);
-  SAFE.set("chart2Title", p.charts.c2);
-  SAFE.set("chart2Sub", p.charts.c2sub);
-  SAFE.set("chart3Title", p.charts.c3);
-  SAFE.set("chart3Sub", p.charts.c3sub);
+  const p=profiles[roleKey]||profiles.marketing;
+  SAFE.set("heroTitle",p.heroTitle);SAFE.set("heroSub",p.heroSub);
+  const kpiTitles=["kpi1Title","kpi2Title","kpi3Title","kpi4Title"];
+  const kpiWhys=["kpi1Why","kpi2Why","kpi3Why","kpi4Why"];
+  const kpiDos=["kpi1Do","kpi2Do","kpi3Do","kpi4Do"];
+  p.kpis.forEach((k,i)=>{SAFE.set(kpiTitles[i],k.title);SAFE.set(kpiWhys[i],`Why: ${k.why}`);SAFE.set(kpiDos[i],`Action: ${k.do}`);});
+  SAFE.set("chart1Title",p.charts.c1);SAFE.set("chart1Sub",p.charts.c1sub);
+  SAFE.set("chart2Title",p.charts.c2);SAFE.set("chart2Sub",p.charts.c2sub);
+  SAFE.set("chart3Title",p.charts.c3);SAFE.set("chart3Sub",p.charts.c3sub);
 }
 
 function applyObjectFocus(objKey){
-  const v = objectViews[objKey] || objectViews.lead;
-
-  // KPI heading
-  SAFE.set("kpiHeading", v.kpiHeading);
-
-  // Default the Salesforce preview to the relevant pane
-  const paneMap = {leadTab: "Lead", cmTab:"Campaign Member", oppTab:"Opportunity", reportsTab:"Reports & ROI"};
+  const v=objectViews[objKey]||objectViews.lead;
+  SAFE.set("kpiHeading",v.kpiHeading);
   document.querySelectorAll(".sf-tab").forEach(b=>b.classList.remove("active"));
-  const tabBtn = Array.from(document.querySelectorAll(".sf-tab")).find(b=>b.dataset.tab===v.sfPane);
-  if(tabBtn){ tabBtn.classList.add("active"); }
-  SAFE.showPane(["leadTab","cmTab","oppTab","reportsTab"], v.sfPane);
-
-  // Light tweak on chart titles to align mentally
-  SAFE.set("chart1Title", v.chart1);
-  SAFE.set("chart2Title", v.chart2);
-  SAFE.set("chart3Title", v.chart3);
-
-  // Optionally, nudge Outcomes card labels
-  if(objKey==="opportunity"){
-    SAFE.set("kpi2Title", "Attributed Revenue");
-    SAFE.set("kpi2Why", "Why: Model choice changes revenue allocation.");
-    SAFE.set("kpi2Do", "Action: Agree FT/LT/Linear/W with Finance for forecasting.");
-  }
+  const tabBtn=[...document.querySelectorAll(".sf-tab")].find(b=>b.dataset.tab===v.sfPane);
+  if(tabBtn)tabBtn.classList.add("active");
+  SAFE.showPane(["leadTab","cmTab","oppTab","reportsTab"],v.sfPane);
+  SAFE.set("chart1Title",v.chart1);SAFE.set("chart2Title",v.chart2);SAFE.set("chart3Title",v.chart3);
+  if(objKey==="opportunity"){SAFE.set("kpi2Title","Attributed Revenue");SAFE.set("kpi2Why","Why: Model choice changes revenue allocation.");SAFE.set("kpi2Do","Action: Agree FT/LT/Linear/W with Finance for forecasting.");}
 }
 
-/* ===== Enrichment demo ===== */
+/* === enrichment demo === */
 function isDemo(p){return String((p.demo_enrich||"")).toLowerCase()==="1"}
-function simulate(params,geo){
-  const seed=(geo?.ip||params?.utm_campaign||"crmh").toLowerCase();
-  const picks=[
-    {company:"Acme Robotics",domain:"acmerobotics.com",industry:"Computer Software",employees:"250–1k",revenue:"$50M–$100M",tech:["Salesforce","HubSpot","Marketo"],intent:["CRM ROI","RevOps consulting"]},
-    {company:"Northstar FinTech",domain:"northstarfin.com",industry:"Financial Services",employees:"1k–5k",revenue:"$500M–$1B",tech:["Salesforce","Pardot","Snowflake"],intent:["Pipeline influence","Attribution modeling"]},
-    {company:"Vertex Cloud",domain:"vertexcloud.io",industry:"Information Technology",employees:"100–250",revenue:"$10M–$50M",tech:["Salesforce","GA4","Segment"],intent:["Lead scoring","Multi-touch ROI"]}
-  ];
-  let h=0; for(let i=0;i<seed.length;i++) h=((h<<5)-h)+seed.charCodeAt(i);
-  const row=picks[Math.abs(h)%picks.length]; return {...row,confidence:(70+Math.abs(h)%20)+"%"};
-}
-function renderEnrich(e){
-  SAFE.set("enrich_company",e?.company||"—");
-  SAFE.set("enrich_domain",e?.domain||"—");
-  SAFE.set("enrich_industry",e?.industry||"—");
-  SAFE.set("enrich_employees",e?.employees||"—");
-  SAFE.set("enrich_revenue",e?.revenue||"—");
-  SAFE.set("enrich_tech",(e?.tech||[]).join(", ")||"—");
-  SAFE.set("enrich_intent",(e?.intent||[]).join(", ")||"—");
-  SAFE.set("enrich_conf",e?.confidence||"—");
-}
-function enrichToSF(e){
-  if(!e) return;
-  SAFE.set("sfLeadCompany",e.company);
-  SAFE.set("sfAccount",e.company);
-  SAFE.set("sfOppAccount",e.company);
-}
+function simulate(params,geo){const seed=(geo?.ip||params?.utm_campaign||"crmh").toLowerCase();const picks=[
+  {company:"Acme Robotics",domain:"acmerobotics.com",industry:"Computer Software",employees:"250–1k",revenue:"$50M–$100M",tech:["Salesforce","HubSpot","Marketo"],intent:["CRM ROI","RevOps consulting"]},
+  {company:"Northstar FinTech",domain:"northstarfin.com",industry:"Financial Services",employees:"1k–5k",revenue:"$500M–$1B",tech:["Salesforce","Pardot","Snowflake"],intent:["Pipeline influence","Attribution modeling"]},
+  {company:"Vertex Cloud",domain:"vertexcloud.io",industry:"Information Technology",employees:"100–250",revenue:"$10M–$50M",tech:["Salesforce","GA4","Segment"],intent:["Lead scoring","Multi-touch ROI"]}
+];let h=0;for(let i=0;i<seed.length;i++)h=((h<<5)-h)+seed.charCodeAt(i);const row=picks[Math.abs(h)%picks.length];return{...row,confidence:(70+Math.abs(h)%20)+"%"}}
+function renderEnrich(e){SAFE.set("enrich_company",e?.company||"—");SAFE.set("enrich_domain",e?.domain||"—");SAFE.set("enrich_industry",e?.industry||"—");SAFE.set("enrich_employees",e?.employees||"—");SAFE.set("enrich_revenue",e?.revenue||"—");SAFE.set("enrich_tech",(e?.tech||[]).join(", ")||"—");SAFE.set("enrich_intent",(e?.intent||[]).join(", ")||"—");SAFE.set("enrich_conf",e?.confidence||"—")}
+function enrichToSF(e){if(!e)return;SAFE.set("sfLeadCompany",e.company);SAFE.set("sfAccount",e.company);SAFE.set("sfOppAccount",e.company)}
 
-/* ===== INIT ===== */
+/* === init === */
 (async function init(){
-  // Persist & render core signals
-  const p = persistParams();
-  renderAcq(p);
+  const p=persistParams();renderAcq(p);
+  const d=device();renderDev(d);
+  let g={};try{g=await geo();renderGeo(g)}catch(e){}
+  if(window.Chart)initCharts();
 
-  const d = device();  renderDev(d);
-  let g={}; try{ g = await geo(); renderGeo(g); }catch(e){}
-  if(window.Chart) initCharts();
-
-  // Salesforce sample fill
-  SAFE.set("sfLeadName","Taylor Example");
-  SAFE.set("sfLeadEmail","taylor@example.com");
-  SAFE.set("sfLeadSource", group(p));
-  SAFE.set("sfUtmSource", p.utm_source||"—");
-  SAFE.set("sfUtmMedium", p.utm_medium||"—");
-  SAFE.set("sfUtmCampaign", p.utm_campaign||"—");
-  SAFE.set("sfLeadSourceDetail", [p.utm_source,p.utm_medium,p.utm_campaign].filter(Boolean).join(" / ")||"(none)");
+  SAFE.set("sfLeadName","Taylor Example");SAFE.set("sfLeadEmail","taylor@example.com");
+  SAFE.set("sfLeadSource",group(p));
+  SAFE.set("sfUtmSource",p.utm_source||"—");SAFE.set("sfUtmMedium",p.utm_medium||"—");SAFE.set("sfUtmCampaign",p.utm_campaign||"—");
+  SAFE.set("sfLeadSourceDetail",[p.utm_source,p.utm_medium,p.utm_campaign].filter(Boolean).join(" / ")||"(none)");
   const clickIds=["gclid","fbclid","msclkid","ttclid","li_fat_id"].filter(k=>p[k]).map(k=>`${k}=${p[k]}`).join(" • ")||"(none)";
-  SAFE.set("sfClickIds", clickIds);
-  SAFE.set("sfDevice", `${d.type} • ${d.os} • ${d.browser} • ${d.screen}`);
-  SAFE.set("sfCreated", new Date().toLocaleString());
+  SAFE.set("sfClickIds",clickIds);
+  SAFE.set("sfDevice",`${d.type} • ${d.os} • ${d.browser} • ${d.screen}`);
+  SAFE.set("sfCreated",new Date().toLocaleString());
 
-  // Outcomes copy & projection
   const amount=25000, cm=p.utm_campaign||"CRMH — ROI Demo";
-  SAFE.set("projSummary", `Model agree + ${amount.toLocaleString('en-US',{style:'currency',currency:'USD'})} opp → FT/LT/Linear/W assign revenue shares to guide spend.`);
-  SAFE.set("visitorSnap", [SAFE.$("country").textContent, SAFE.$("region").textContent, SAFE.$("city").textContent].filter(Boolean).join(", ") + " • " + d.type);
-  SAFE.set("engageSnap","0s • 0% • 1 pv");
-
-  // Reports mock
   const revFT=amount, revLT=amount, revLIN=amount, revW=amount;
-  SAFE.set("sfCmName","Taylor Example"); SAFE.set("sfCampaign",cm);
+  SAFE.set("projSummary",`Model agree + ${amount.toLocaleString('en-US',{style:'currency',currency:'USD'})} opp → FT/LT/Linear/W shares guide spend.`);
+  SAFE.set("sfCmName","Taylor Example");SAFE.set("sfCampaign",cm);
   SAFE.set("sfTouchRole",(p.gclid||p.li_fat_id)?"Last Touch":"Assist");
   SAFE.set("sfAttribPct",(p.gclid||p.li_fat_id)?"100%":"25%");
   SAFE.set("sfMemberStatus","Responded");
-  SAFE.set("sfCmUtms", JSON.stringify({utm_source:p.utm_source||null,utm_medium:p.utm_medium||null,utm_campaign:p.utm_campaign||null,gclid:p.gclid||null,li_fat_id:p.li_fat_id||null}));
+  SAFE.set("sfCmUtms",JSON.stringify({utm_source:p.utm_source||null,utm_medium:p.utm_medium||null,utm_campaign:p.utm_campaign||null,gclid:p.gclid||null,li_fat_id:p.li_fat_id||null}));
   SAFE.set("sfOppName",(SAFE.$("sfAccount").textContent||"Acme Corp")+" — RevOps Implementation");
-  SAFE.set("sfOppAmount", amount.toLocaleString('en-US',{style:'currency',currency:'USD'}));
-  SAFE.set("sfOppStage","Negotiation/Review"); SAFE.set("sfPrimaryCampaign",cm);
-  SAFE.set("sfLT",  revLT .toLocaleString('en-US',{style:'currency',currency:'USD'}));
-  SAFE.set("sfFT",  revFT .toLocaleString('en-US',{style:'currency',currency:'USD'}));
-  SAFE.set("sfLIN", revLIN.toLocaleString('en-US',{style:'currency',currency:'USD'}));
-  SAFE.set("sfW",   revW  .toLocaleString('en-US',{style:'currency',currency:'USD'}));
+  SAFE.set("sfOppAmount",amount.toLocaleString('en-US',{style:'currency',currency:'USD'}));
+  SAFE.set("sfOppStage","Negotiation/Review");SAFE.set("sfPrimaryCampaign",cm);
+  SAFE.set("sfLT",revLT.toLocaleString('en-US',{style:'currency',currency:'USD'}));
+  SAFE.set("sfFT",revFT.toLocaleString('en-US',{style:'currency',currency:'USD'}));
+  SAFE.set("sfLIN",revLIN.toLocaleString('en-US',{style:'currency',currency:'USD'}));
+  SAFE.set("sfW",revW.toLocaleString('en-US',{style:'currency',currency:'USD'}));
 
-  const rows=[
-    {name:"ROI Demo – Google Ads", spend:1200, pipeline:48000, revenue:revFT,  model:"First Touch"},
-    {name:"ROI Ebook – LinkedIn",  spend: 800, pipeline:22000, revenue:Math.round(amount*0.10), model:"Assist/Linear"},
-    {name:"ROI Webinar – Email",   spend: 300, pipeline:15000, revenue:Math.round(amount*0.20), model:"W-Shaped"},
-    {name:cm,                      spend:1000, pipeline:30000, revenue:revLT,  model:"Last Touch"}
-  ];
-  const tbody=document.getElementById("roiTableBody"); if(tbody){tbody.innerHTML=""; rows.forEach(r=>{const roi=((r.revenue-r.spend)/Math.max(1,r.spend))*100; const tr=document.createElement("tr"); tr.innerHTML=`
+  const rows=[{name:"ROI Demo – Google Ads",spend:1200,pipeline:48000,revenue:revFT,model:"First Touch"},
+              {name:"ROI Ebook – LinkedIn",spend:800,pipeline:22000,revenue:Math.round(amount*0.10),model:"Assist/Linear"},
+              {name:"ROI Webinar – Email",spend:300,pipeline:15000,revenue:Math.round(amount*0.20),model:"W-Shaped"},
+              {name:cm,spend:1000,pipeline:30000,revenue:revLT,model:"Last Touch"}];
+  const tbody=SAFE.$("roiTableBody");if(tbody){tbody.innerHTML="";rows.forEach(r=>{const roi=((r.revenue-r.spend)/Math.max(1,r.spend))*100;const tr=document.createElement("tr");tr.innerHTML=`
     <td>${r.name}</td><td>${r.spend.toLocaleString('en-US',{style:'currency',currency:'USD'})}</td>
     <td>${r.pipeline.toLocaleString('en-US',{style:'currency',currency:'USD'})}</td>
     <td>${r.revenue.toLocaleString('en-US',{style:'currency',currency:'USD'})}</td>
-    <td>${roi.toFixed(0)}%</td><td>${r.model}</td>`; tbody.appendChild(tr);});}
+    <td>${roi.toFixed(0)}%</td><td>${r.model}</td>`;tbody.appendChild(tr);});}
 
-  // Enrichment demo
-  if(isDemo(p)){ const e=simulate(p,g); renderEnrich(e); enrichToSF(e); }
+  if(String((p.demo_enrich||"")).toLowerCase()==="1"){const e=simulate(p,g);renderEnrich(e);enrichToSF(e);}
 
-  // Role & Object defaults + listeners
-  const roleSel = SAFE.$("roleSelect"), objSel = SAFE.$("objectSelect");
+  // Wire picklists
+  const roleSel=SAFE.$("roleSelect"), objSel=SAFE.$("objectSelect");
   applyRole(roleSel.value); applyObjectFocus(objSel.value);
-  roleSel.addEventListener("change", ()=> applyRole(roleSel.value));
-  objSel.addEventListener("change", ()=> applyObjectFocus(objSel.value));
+  roleSel.addEventListener("change",()=>applyRole(roleSel.value));
+  objSel.addEventListener("change",()=>applyObjectFocus(objSel.value));
 })();
 </script>
 </body>
