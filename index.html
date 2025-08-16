@@ -288,133 +288,175 @@
     </div>
   </main>
 
-  <script>
-    /* ===== BRAND CONFIG (swap logo/CTA if you want) ===== */
-    const BRAND = {
-      name: "CRM Hacker",
-      tag: "Salesforce & RevOps done right",
-      logoUrl: "https://static.wixstatic.com/media/ab48db_05ac959e31e0427e9a6555528a57083d~mv2.png/v1/fill/w_980,h_127,al_c,q_85,enc_avif,quality_auto/Logo.png",
-      ctaUrl: "https://calendly.com/crmhacker_jonathan",
-      heroLine: "From click → closed: watch your data populate in real time."
-    };
-    (function applyBrand(){
-      document.getElementById("brandName").textContent = BRAND.name;
-      document.getElementById("footBrand").textContent = BRAND.name;
-      document.getElementById("brandTag").textContent = BRAND.tag;
-      document.getElementById("heroLine").textContent = BRAND.heroLine;
-      const logoEl = document.getElementById("brandLogo");
-      if (BRAND.logoUrl) { logoEl.src = BRAND.logoUrl; logoEl.alt = BRAND.name + " logo"; }
-      const ctaBtn = document.getElementById("ctaBtn"); if (ctaBtn) ctaBtn.href = BRAND.ctaUrl;
-    })();
+ <script>
+/* ================== SAFE HELPERS ================== */
+const SAFE = {
+  $: (id) => document.getElementById(id),
+  set: (id, v) => { const el = SAFE.$(id); if (el) el.textContent = (v ?? "—"); },
+  on: (id, evt, fn) => { const el = SAFE.$(id); if (el && el.addEventListener) el.addEventListener(evt, fn); },
+  warn: (...args) => console.warn("[ROI-DEMO]", ...args),
+  err:  (...args) => console.error("[ROI-DEMO]", ...args),
+};
 
-    /* ===== Param helpers ===== */
-    const COMMON_PARAMS = ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id"];
-    function getParams(){ const url = new URL(window.location.href); return Object.fromEntries(url.searchParams.entries()); }
-    function persistParams(){
-      const p = getParams();
-      const existing = JSON.parse(sessionStorage.getItem("params")||"{}");
-      const next = { ...existing };
-      COMMON_PARAMS.forEach(k => { if (p[k]) next[k] = p[k]; });
-      next.landingUrl = window.location.href;
-      sessionStorage.setItem("params", JSON.stringify(next));
-      return next;
-    }
-    function getReferrer(){ return document.referrer || "(direct / none)"; }
+window.addEventListener("error", (e) => SAFE.err("window error:", e.message));
+window.addEventListener("unhandledrejection", (e) => SAFE.err("unhandled promise:", e.reason));
 
-    /* ===== Device info ===== */
-    function deviceInfo(){
-      const ua = navigator.userAgent;
-      const isMobile = /Mobi|Android/i.test(ua);
-      const os = /Windows NT/i.test(ua) ? "Windows" :
-                 /Mac OS X/i.test(ua) ? "macOS" :
-                 /Android/i.test(ua) ? "Android" :
-                 /iPhone|iPad|iPod/i.test(ua) ? "iOS" :
-                 /Linux/i.test(ua) ? "Linux" : "Other";
-      const browser = /Chrome/i.test(ua) && !/Edg/i.test(ua) ? "Chrome" :
-                      /Edg/i.test(ua) ? "Edge" :
-                      /Firefox/i.test(ua) ? "Firefox" :
-                      /Safari/i.test(ua) && !/Chrome/i.test(ua) ? "Safari" :
-                      /Opera|OPR/i.test(ua) ? "Opera" : "Other";
-      const screenSize = `${window.screen.width}×${window.screen.height}`;
-      return { type: isMobile ? "Mobile" : "Desktop", os, browser, screen: screenSize, ua };
-    }
+/* ================== UTM PARSING (robust) ================== */
+const COMMON_PARAMS = ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id"];
+function parseQuery() {
+  const out = {};
+  const q = location.search.startsWith("?") ? location.search.slice(1) : location.search;
+  if (!q) return out;
+  for (const part of q.split("&")) {
+    if (!part) continue;
+    const [kRaw, vRaw=""] = part.split("=");
+    const k = decodeURIComponent(kRaw||"").trim().toLowerCase();
+    const v = decodeURIComponent(vRaw||"").trim();
+    if (!k) continue;
+    out[k] = v;
+  }
+  return out;
+}
+function persistParams() {
+  const p = parseQuery();
+  const prev = JSON.parse(sessionStorage.getItem("params") || "{}");
+  const next = { ...prev };
+  for (const k of COMMON_PARAMS) if (p[k]) next[k] = p[k];
+  next.landingUrl = location.href;
+  sessionStorage.setItem("params", JSON.stringify(next));
+  return next;
+}
+function getReferrer(){ return document.referrer || "(direct / none)"; }
+function campaignGrouping(params){
+  const src = (params.utm_source||"").toLowerCase();
+  const med = (params.utm_medium||"").toLowerCase();
+  if(params.gclid) return "google-ads";
+  if(params.fbclid) return "meta-ads";
+  if(params.msclkid) return "microsoft-ads";
+  if(params.li_fat_id) return "linkedin-ads";
+  if(src.includes("linkedin")) return "linkedin";
+  if(src.includes("google")) return "google-other";
+  if(src.includes("newsletter")||med==="email") return "email";
+  if(!src && !document.referrer) return "direct";
+  return `${src||"unknown"}-${med||"unknown"}`;
+}
 
-    /* ===== Geo lookup (free) ===== */
-    async function geoLookup(){
-      try{
-        const r = await fetch("https://ipapi.co/json/");
-        if(r.ok){
-          const j = await r.json();
-          return { ip:j.ip||null, city:j.city||null, region:j.region||null, country:j.country_name||j.country||null, org:j.org||j.asn||null };
-        }
-        throw new Error("ipapi failed");
-      }catch(e){
-        try{
-          const r2 = await fetch("https://ipinfo.io/json?token="); // limited fields without token
-          if(r2.ok){
-            const j2 = await r2.json();
-            return { ip:j2.ip||null, city:j2.city||null, region:j2.region||null, country:j2.country||null, org:j2.org||null };
-          }
-        }catch(e2){}
-      }
-      return { ip:null, city:null, region:null, country:null, org:null };
-    }
+/* ================== DEVICE INFO (no network) ================== */
+function deviceInfo(){
+  const ua = navigator.userAgent || "";
+  const isMobile = /Mobi|Android/i.test(ua);
+  const os = /Windows NT/i.test(ua) ? "Windows" :
+             /Mac OS X/i.test(ua) ? "macOS" :
+             /Android/i.test(ua) ? "Android" :
+             /iPhone|iPad|iPod/i.test(ua) ? "iOS" :
+             /Linux/i.test(ua) ? "Linux" : "Other";
+  const browser = /Chrome/i.test(ua) && !/Edg/i.test(ua) ? "Chrome" :
+                  /Edg/i.test(ua) ? "Edge" :
+                  /Firefox/i.test(ua) ? "Firefox" :
+                  /Safari/i.test(ua) && !/Chrome/i.test(ua) ? "Safari" :
+                  /Opera|OPR/i.test(ua) ? "Opera" : "Other";
+  const screenSize = `${window.screen.width}×${window.screen.height}`;
+  return { type: isMobile ? "Mobile" : "Desktop", os, browser, screen: screenSize, ua };
+}
 
-    /* ===== Session metrics ===== */
-    const sessionMetrics = { start: Date.now(), scrollMax: 0, pageviews: 1, timeline: [] };
-    (function initPV(){
-      const key="pv"; const cur=Number(sessionStorage.getItem(key)||"0")+1;
-      sessionStorage.setItem(key,String(cur)); sessionMetrics.pageviews = cur;
-    })();
-    window.addEventListener("scroll", ()=>{
-      const depth = Math.round(100 * (window.scrollY + window.innerHeight) / document.body.scrollHeight);
-      sessionMetrics.scrollMax = Math.min(100, Math.max(sessionMetrics.scrollMax, depth));
-    });
-    setInterval(()=>{
-      const t = Math.round((Date.now()-sessionMetrics.start)/1000);
-      sessionMetrics.timeline.push({t, depth: sessionMetrics.scrollMax});
-      renderSession();
-      updateEngageChart();
-    }, 1000);
+/* ================== GEO IP (with fallbacks + timeout) ================== */
+function withTimeout(promise, ms=3500){
+  let t; return Promise.race([
+    promise, new Promise((_,rej)=> t=setTimeout(()=>rej(new Error("timeout")), ms))
+  ]).finally(()=> clearTimeout(t));
+}
+async function geoFromIpapi(){
+  const r = await withTimeout(fetch("https://ipapi.co/json/"), 3500);
+  if (!r.ok) throw new Error("ipapi bad status");
+  const j = await r.json();
+  return { ip:j.ip||null, city:j.city||null, region:j.region||null, country:j.country_name||j.country||null, org:j.org||j.asn||null };
+}
+async function geoFromIpwho(){
+  const r = await withTimeout(fetch("https://ipwho.is/"), 3500);
+  if (!r.ok) throw new Error("ipwho bad status");
+  const j = await r.json();
+  if (j && j.success !== false) {
+    return { ip:j.ip||null, city:j.city||null, region:j.region||null, country:j.country||null, org:j.connection?.org||null };
+  }
+  throw new Error("ipwho failed flag");
+}
+async function geoFromGeoJS(){
+  const r = await withTimeout(fetch("https://get.geojs.io/v1/ip/geo.json"), 3500);
+  if (!r.ok) throw new Error("geojs bad status");
+  const j = await r.json();
+  return { ip:j.ip||null, city:j.city||null, region:j.region||null, country:j.country||null, org:j.organization_name||null };
+}
+async function ipOnlyIpify(){
+  const r = await withTimeout(fetch("https://api.ipify.org?format=json"), 3500);
+  if (!r.ok) throw new Error("ipify bad status");
+  const j = await r.json();
+  return { ip:j.ip||null, city:null, region:null, country:null, org:null };
+}
+async function geoLookup(){
+  for (const fn of [geoFromIpapi, geoFromIpwho, geoFromGeoJS, ipOnlyIpify]) {
+    try { const g = await fn(); if (g) return g; }
+    catch(e){ SAFE.warn("geo fallback:", e.message); }
+  }
+  return { ip:null, city:null, region:null, country:null, org:null };
+}
 
-    /* ===== Campaign grouping ===== */
-    function campaignGrouping(params){
-      const src = (params.utm_source||"").toLowerCase();
-      const med = (params.utm_medium||"").toLowerCase();
-      if(params.gclid) return "google-ads";
-      if(params.fbclid) return "meta-ads";
-      if(params.msclkid) return "microsoft-ads";
-      if(params.li_fat_id) return "linkedin-ads";
-      if(src.includes("linkedin")) return "linkedin";
-      if(src.includes("google")) return "google-other";
-      if(src.includes("newsletter")||med==="email") return "email";
-      if(!src && !document.referrer) return "direct";
-      return `${src||"unknown"}-${med||"unknown"}`;
-    }
+/* ================== SESSION METRICS (guarded) ================== */
+const sessionMetrics = { start: Date.now(), scrollMax: 0, pageviews: 1, timeline: [] };
+(function initPV(){
+  try{
+    const key="pv"; const cur=Number(sessionStorage.getItem(key)||"0")+1;
+    sessionStorage.setItem(key,String(cur)); sessionMetrics.pageviews = cur;
+  }catch(e){ SAFE.warn("sessionStorage disabled?", e.message); }
+})();
+window.addEventListener("scroll", ()=>{
+  try{
+    const depth = Math.round(100 * (window.scrollY + window.innerHeight) / document.body.scrollHeight);
+    sessionMetrics.scrollMax = Math.min(100, Math.max(sessionMetrics.scrollMax, depth));
+  }catch(e){/* ignore */}
+});
+setInterval(()=>{
+  const t = Math.round((Date.now()-sessionMetrics.start)/1000);
+  sessionMetrics.timeline.push({t, depth: sessionMetrics.scrollMax});
+  renderSession();
+  try { updateEngageChart(); } catch(e){/* charts may be absent */}
+}, 1000);
 
-    /* ===== Render helpers ===== */
-    function $t(id,val){ const el=document.getElementById(id); if(el) el.textContent = val ?? "—"; }
-    function renderAcq(params){
-      $t("referrer", getReferrer());
-      $t("landingUrl", params.landingUrl || window.location.href);
-      ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id"].forEach(k => $t(k, params[k] || "—"));
-      $t("campaignGroup", campaignGrouping(params));
-      // update source donut
-      updateSourceDonut(campaignGrouping(params));
-    }
-    function renderDevice(d){ $t("deviceType", d.type); $t("os", d.os); $t("browser", d.browser); $t("screen", d.screen); $t("ua", d.ua); updateDeviceBar(d); }
-    function renderGeo(g){ $t("ip", g.ip); $t("city", g.city); $t("region", g.region); $t("country", g.country); $t("org", g.org); }
-    function renderSession(){ const elapsed = Math.round((Date.now()-sessionMetrics.start)/1000); $t("timeOnPage", `${elapsed}s`); $t("scrollDepth", `${sessionMetrics.scrollMax}%`); $t("pageviews", String(sessionMetrics.pageviews)); }
+/* ================== RENDERERS (null-safe) ================== */
+function renderAcq(params){
+  SAFE.set("referrer", getReferrer());
+  SAFE.set("landingUrl", params.landingUrl || location.href);
+  ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id"]
+    .forEach(k => SAFE.set(k, params[k] || "—"));
+  const group = campaignGrouping(params);
+  SAFE.set("campaignGroup", group);
+  try { updateSourceDonut(group); } catch(e){ /* charts optional */ }
+}
+function renderDevice(d){
+  SAFE.set("deviceType", d.type); SAFE.set("os", d.os); SAFE.set("browser", d.browser);
+  SAFE.set("screen", d.screen);   SAFE.set("ua", d.ua);
+  try { updateDeviceBar(d); } catch(e){ /* charts optional */ }
+}
+function renderGeo(g){
+  SAFE.set("ip", g.ip); SAFE.set("city", g.city); SAFE.set("region", g.region);
+  SAFE.set("country", g.country); SAFE.set("org", g.org);
+}
+function renderSession(){
+  const elapsed = Math.round((Date.now()-sessionMetrics.start)/1000);
+  SAFE.set("timeOnPage", `${elapsed}s`);
+  SAFE.set("scrollDepth", `${sessionMetrics.scrollMax}%`);
+  SAFE.set("pageviews", String(sessionMetrics.pageviews));
+}
 
-    /* ===== Charts (GA-style) ===== */
-    let sourceDonut, deviceBar, engageLine;
+/* ================== CHARTS (guard every call) ================== */
+let sourceDonut, deviceBar, engageLine;
+function initCharts(){
+  if (!window.Chart) { SAFE.warn("Chart.js not available; skipping charts"); return; }
+  try{
     const brand = getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#15a3d4';
     const brand2 = getComputedStyle(document.documentElement).getPropertyValue('--brand2').trim() || '#06b6d4';
-    const muted = '#94a3b8';
 
-    function initCharts(){
-      // Source Donut
-      const sd = document.getElementById('sourceDonut');
+    const sd = SAFE.$('sourceDonut');
+    if (sd) {
       sourceDonut = new Chart(sd, {
         type: 'doughnut',
         data: {
@@ -423,21 +465,18 @@
         },
         options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' }
       });
+    }
 
-      // Device Bar
-      const db = document.getElementById('deviceBar');
+    const db = SAFE.$('deviceBar');
+    if (db) {
       deviceBar = new Chart(db, {
         type: 'bar',
         data: {
           labels: ['Desktop / Windows','Desktop / macOS','Mobile / iOS','Mobile / Android'],
           datasets: [{
-            label: 'This visit',
-            data: [0,0,0,0],
-            backgroundColor: brand
+            label: 'This visit', data: [0,0,0,0], backgroundColor: brand
           },{
-            label: 'Example mix',
-            data: [35,25,20,20],
-            backgroundColor: '#e2e8f0'
+            label: 'Example mix', data: [35,25,20,20], backgroundColor: '#e2e8f0'
           }]
         },
         options: {
@@ -445,106 +484,102 @@
           scales: { y: { beginAtZero: true, ticks: { stepSize: 10 } } }
         }
       });
+    }
 
-      // Engagement Line
-      const el = document.getElementById('engageLine');
+    const el = SAFE.$('engageLine');
+    if (el) {
       engageLine = new Chart(el, {
         type: 'line',
-        data: {
-          labels: [],
-          datasets: [{
-            label: 'Time on page (s) / Depth %',
-            data: [],
-            borderColor: brand,
-            tension: .3
-          }]
-        },
+        data: { labels: [], datasets: [{ label: 'Depth %', data: [], borderColor: brand, tension: .3 }] },
         options: {
           plugins: { legend: { display: false } },
-          scales: {
-            x: { title: { display: true, text: 'Seconds' } },
-            y: { title: { display: true, text: 'Scroll depth %' }, suggestedMin: 0, suggestedMax: 100 }
-          }
+          scales: { x:{ title:{ display:true, text:'Seconds'} }, y:{ title:{ display:true, text:'Scroll depth %'}, suggestedMin:0, suggestedMax:100 } }
         }
       });
     }
+  }catch(e){ SAFE.err("chart init failed", e); }
+}
+function updateSourceDonut(group){
+  if(!sourceDonut) return;
+  const map = { 'google-ads':0,'linkedin-ads':1,'email':2,'direct':3 };
+  const idx = map[group] ?? 4;
+  sourceDonut.data.datasets[0].data[idx] += 1;
+  sourceDonut.update();
+}
+function updateDeviceBar(d){
+  if(!deviceBar) return;
+  const idx = (d.type==='Desktop' && d.os==='Windows') ? 0
+            : (d.type==='Desktop' && d.os==='macOS') ? 1
+            : (d.type==='Mobile' && d.os==='iOS') ? 2
+            : (d.type==='Mobile' && d.os==='Android') ? 3
+            : 0;
+  deviceBar.data.datasets[0].data = [0,0,0,0];
+  deviceBar.data.datasets[0].data[idx] = 1;
+  deviceBar.update();
+}
+function updateEngageChart(){
+  if(!engageLine) return;
+  const last = sessionMetrics.timeline[sessionMetrics.timeline.length-1];
+  if(!last) return;
+  engageLine.data.labels.push(last.t);
+  engageLine.data.datasets[0].data.push(last.depth);
+  if(engageLine.data.labels.length>60){ engageLine.data.labels.shift(); engageLine.data.datasets[0].data.shift(); }
+  engageLine.update();
+}
 
-    function updateSourceDonut(group){
-      if(!sourceDonut) return;
-      const idx = { 'google-ads':0,'linkedin-ads':1,'email':2,'direct':3 }[group] ?? 4;
-      sourceDonut.data.datasets[0].data[idx] += 1;
-      sourceDonut.update();
-    }
-
-    function updateDeviceBar(d){
-      if(!deviceBar) return;
-      const mapIndex = ()=>{
-        if(d.type==='Desktop' && d.os==='Windows') return 0;
-        if(d.type==='Desktop' && d.os==='macOS') return 1;
-        if(d.type==='Mobile' && d.os==='iOS') return 2;
-        if(d.type==='Mobile' && d.os==='Android') return 3;
-        return 0;
-      };
-      deviceBar.data.datasets[0].data = [0,0,0,0];
-      deviceBar.data.datasets[0].data[mapIndex()] = 1;
-      deviceBar.update();
-    }
-
-    function updateEngageChart(){
-      if(!engageLine) return;
-      const last = sessionMetrics.timeline[sessionMetrics.timeline.length-1];
-      if(!last) return;
-      engageLine.data.labels.push(last.t);
-      engageLine.data.datasets[0].data.push(last.depth);
-      if(engageLine.data.labels.length > 60){ // keep to last minute
-        engageLine.data.labels.shift();
-        engageLine.data.datasets[0].data.shift();
+/* ================== PDF (optional, guarded) ================== */
+async function downloadPDF(){
+  try{
+    if (!window.jspdf || !window.jspdf.jsPDF) throw new Error("jsPDF unavailable");
+    const el = document.querySelector("main");
+    const canvas = await html2canvas(el);
+    const imgData = canvas.toDataURL("image/png");
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation:"p", unit:"pt", format:"a4" });
+    const pageW = pdf.internal.pageSize.getWidth(), pageH = pdf.internal.pageSize.getHeight();
+    const margin = 24, imgW = pageW - margin*2, ratio = canvas.height / canvas.width, imgH = imgW * ratio;
+    pdf.text("Live ROI Tracking Demo", margin, 28);
+    if(imgH <= pageH - 60){ pdf.addImage(imgData, "PNG", margin, 40, imgW, imgH); }
+    else {
+      const sliceH = pageH - 80; let y = 0, page = 0;
+      while(y < canvas.height){
+        const slice = document.createElement("canvas");
+        slice.width = canvas.width; slice.height = Math.min(sliceH * canvas.width / imgW, canvas.height - y);
+        slice.getContext("2d").drawImage(canvas, 0, y, canvas.width, slice.height, 0, 0, slice.width, slice.height);
+        const img = slice.toDataURL("image/png"); if(page>0) pdf.addPage();
+        pdf.addImage(img, "PNG", margin, 40, imgW, (slice.height / canvas.width) * imgW);
+        y += slice.height; page++;
       }
-      engageLine.update();
     }
+    pdf.save("Live_Tracking_Report.pdf");
+  }catch(e){ SAFE.warn("PDF export skipped:", e.message); }
+}
+SAFE.on("downloadPdfBtn", "click", downloadPDF);
 
-    /* ===== PDF export ===== */
-    async function downloadPDF(){
-      const el = document.querySelector("main");
-      const canvas = await html2canvas(el);
-      const imgData = canvas.toDataURL("image/png");
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({ orientation:"p", unit:"pt", format:"a4" });
-      const pageW = pdf.internal.pageSize.getWidth();
-      const pageH = pdf.internal.pageSize.getHeight();
-      const margin = 24, imgW = pageW - margin*2, ratio = canvas.height / canvas.width, imgH = imgW * ratio;
-      pdf.text(`${BRAND.name} — Live ROI Tracking Demo`, margin, 28);
-      if(imgH <= pageH - 60){
-        pdf.addImage(imgData, "PNG", margin, 40, imgW, imgH);
-      } else {
-        const sliceH = pageH - 80; let y = 0; let page = 0;
-        while(y < canvas.height){
-          const slice = document.createElement("canvas");
-          slice.width = canvas.width; slice.height = Math.min(sliceH * canvas.width / imgW, canvas.height - y);
-          slice.getContext("2d").drawImage(canvas, 0, y, canvas.width, slice.height, 0, 0, slice.width, slice.height);
-          const img = slice.toDataURL("image/png"); if(page>0) pdf.addPage();
-          pdf.addImage(img, "PNG", margin, 40, imgW, (slice.height / canvas.width) * imgW);
-          y += slice.height; page++;
-        }
-      }
-      pdf.save("Live_Tracking_Report.pdf");
-    }
-    document.getElementById("downloadPdfBtn").addEventListener("click", downloadPDF);
+/* ================== INIT (always render something) ================== */
+(async function init(){
+  initCharts();
 
-    /* ===== Init ===== */
-    (async function init(){
-      initCharts();
+  const params = persistParams();
+  renderAcq(params);
 
-      const params = persistParams();
-      const dev = deviceInfo();
-      const geo = await geoLookup();
+  const dev = deviceInfo();
+  renderDevice(dev);
 
-      renderAcq(params); renderDevice(dev); renderGeo(geo); renderSession();
+  try {
+    const geo = await geoLookup();
+    renderGeo(geo);
+  } catch(e) {
+    SAFE.warn("geo failed entirely:", e.message);
+  }
 
-      // Sample projection values (demo)
-      const cost = 4.00, pipe = 12000, close = 0.21, rev = Math.round(pipe * close);
-      $t("projCost", `$${cost.toFixed(2)}`); $t("projPipe", `$${pipe.toLocaleString()}`); $t("projClose", `${Math.round(close*100)}%`); $t("projRev", `$${rev.toLocaleString()}`);
-    })();
-  </script>
+  // Demo projection (static)
+  SAFE.set("projCost", "$4.00");
+  SAFE.set("projPipe", "$12,000");
+  SAFE.set("projClose", "21%");
+  SAFE.set("projRev", "$2,520");
+})();
+</script>
+
 </body>
 </html>
