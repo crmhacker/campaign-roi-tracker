@@ -243,6 +243,113 @@
       </div>
     </section>
 
+<!-- ================== SALESFORCE PREVIEW (drop-in) ================== -->
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="kicker">Salesforce Preview</div>
+      <h2 class="h2">What this looks like inside Salesforce</h2>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="sf-tabs card" style="margin-bottom:14px">
+    <button class="sf-tab active" data-tab="leadTab">Lead</button>
+    <button class="sf-tab" data-tab="cmTab">Campaign Member</button>
+    <button class="sf-tab" data-tab="oppTab">Opportunity</button>
+    <button class="sf-tab" data-tab="reportsTab">Reports & ROI</button>
+  </div>
+
+  <!-- Lead -->
+  <div id="leadTab" class="sf-pane card">
+    <div class="sf-header">
+      <div class="sf-title">Lead • <span id="sfLeadName">—</span></div>
+      <span class="sf-badge">Sample</span>
+    </div>
+    <div class="sf-grid">
+      <div class="sf-field"><label>Company</label><div id="sfLeadCompany">—</div></div>
+      <div class="sf-field"><label>Email</label><div id="sfLeadEmail">—</div></div>
+      <div class="sf-field"><label>Lead Source</label><div id="sfLeadSource">—</div></div>
+      <div class="sf-field"><label>Lead Source Detail</label><div id="sfLeadSourceDetail">—</div></div>
+      <div class="sf-field"><label>UTM Source</label><div id="sfUtmSource">—</div></div>
+      <div class="sf-field"><label>UTM Medium</label><div id="sfUtmMedium">—</div></div>
+      <div class="sf-field"><label>UTM Campaign</label><div id="sfUtmCampaign">—</div></div>
+      <div class="sf-field"><label>Click IDs</label><div id="sfClickIds">—</div></div>
+      <div class="sf-field"><label>Device</label><div id="sfDevice">—</div></div>
+      <div class="sf-field"><label>Geo</label><div id="sfGeo">—</div></div>
+      <div class="sf-field"><label>Created Date</label><div id="sfCreated">—</div></div>
+      <div class="sf-field"><label>Owner</label><div>CRM Hacker (Queue)</div></div>
+    </div>
+    <p class="sub" style="margin-top:8px">Mapping: <em>Lead Source</em> = channel bucket; <em>Lead Source Detail</em> = utm_source/medium/campaign; UTM fields retained on Lead for audit & BI.</p>
+  </div>
+
+  <!-- Campaign Member -->
+  <div id="cmTab" class="sf-pane card" hidden>
+    <div class="sf-header">
+      <div class="sf-title">Campaign Member • <span id="sfCmName">—</span></div>
+      <span class="sf-badge">Sample</span>
+    </div>
+    <div class="sf-grid">
+      <div class="sf-field"><label>Campaign</label><div id="sfCampaign">—</div></div>
+      <div class="sf-field"><label>Member Status</label><div id="sfMemberStatus">Responded</div></div>
+      <div class="sf-field"><label>Touch Role</label><div id="sfTouchRole">Last Touch</div></div>
+      <div class="sf-field"><label>Attribution %</label><div id="sfAttribPct">100%</div></div>
+      <div class="sf-field"><label>Account (ABM)</label><div id="sfAccount">—</div></div>
+      <div class="sf-field"><label>UTM/CIDs Snapshot</label><div id="sfCmUtms">—</div></div>
+    </div>
+    <p class="sub" style="margin-top:8px">Multi-touch: we store each touch as a Campaign Member with its UTMs/Click IDs, then allocate % credit by model (FT/LT/Linear/W-shape).</p>
+  </div>
+
+  <!-- Opportunity -->
+  <div id="oppTab" class="sf-pane card" hidden>
+    <div class="sf-header">
+      <div class="sf-title">Opportunity • <span id="sfOppName">—</span></div>
+      <span class="sf-badge">Sample</span>
+    </div>
+    <div class="sf-grid">
+      <div class="sf-field"><label>Account</label><div id="sfOppAccount">—</div></div>
+      <div class="sf-field"><label>Amount</label><div id="sfOppAmount">$25,000</div></div>
+      <div class="sf-field"><label>Stage</label><div id="sfOppStage">Negotiation/Review</div></div>
+      <div class="sf-field"><label>Primary Campaign Source</label><div id="sfPrimaryCampaign">—</div></div>
+      <div class="sf-field"><label>Model: Last Touch</label><div id="sfLT">$—</div></div>
+      <div class="sf-field"><label>Model: First Touch</label><div id="sfFT">$—</div></div>
+      <div class="sf-field"><label>Model: Linear</label><div id="sfLIN">$—</div></div>
+      <div class="sf-field"><label>Model: W-Shaped</label><div id="sfW">$—</div></div>
+    </div>
+    <p class="sub" style="margin-top:8px">We push Campaign Members to the Opp via Campaign Influence or custom logic for ABM. Models allocate attributed revenue across touches.</p>
+  </div>
+
+  <!-- Reports & ROI -->
+  <div id="reportsTab" class="sf-pane card" hidden>
+    <div class="sf-header"><div class="sf-title">Reports • Campaign ROI (Samples)</div><span class="sf-badge">Sample</span></div>
+    <div class="tiles cols-4" style="margin-top:8px">
+      <div class="tile" style="grid-column:span 2">
+        <h3>ROI by Campaign (table)</h3>
+        <div class="sf-table-wrap">
+          <table class="sf-table" id="roiTable">
+            <thead><tr><th>Campaign</th><th>Spend</th><th>Pipeline $</th><th>Revenue $</th><th>ROI %</th><th>Model</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="tile">
+        <h3>Revenue by Model</h3>
+        <canvas id="modelBar" height="180"></canvas>
+      </div>
+      <div class="tile">
+        <h3>Touches per Opp</h3>
+        <canvas id="touchDist" height="180"></canvas>
+      </div>
+    </div>
+    <div class="notice" style="margin-top:12px">
+      <strong>ROI Formula:</strong> <code>(Attributed Revenue − Campaign Spend) ÷ Campaign Spend</code> → ROI%.<br/>
+      <strong>Spend:</strong> Ad cost + media fees (+ optional SDR/AE cost). <strong>Revenue:</strong> closed-won amount × attribution share.<br/>
+      <strong>Models:</strong> First-Touch (FT), Last-Touch (LT), Linear (even split), W-Shaped (FT, Lead-Create, Opp-Create weighted; e.g., 30/30/30 and 10% to assists). Choose based on your sales cycle and goals.
+    </div>
+  </div>
+</section>
+
+    
     <!-- JOURNEY & ROI -->
     <section class="section">
       <div class="section-title">
