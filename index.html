@@ -351,176 +351,208 @@
   </main>
 
   <script>
-  /* ==== SAFE HELPERS ==== */
-  const SAFE = {
-    $: (id) => document.getElementById(id),
-    set: (id, v) => { const el = SAFE.$(id); if (el) el.textContent = (v ?? "—"); },
-    on: (id, evt, fn) => { const el = SAFE.$(id); if (el && el.addEventListener) el.addEventListener(evt, fn); },
-    warn: (...a) => console.warn("[ROI-DEMO]", ...a),
-    err:  (...a) => console.error("[ROI-DEMO]", ...a),
-  };
-  window.addEventListener("error", (e) => SAFE.err("window error:", e.message));
-  window.addEventListener("unhandledrejection", (e) => SAFE.err("unhandled promise:", e.reason));
+/* ===== SAFE HELPERS ===== */
+const SAFE = {
+  $: (id) => document.getElementById(id),
+  set: (id, v) => { const el = SAFE.$(id); if (el) el.textContent = (v ?? "—"); },
+  on: (id, evt, fn) => { const el = SAFE.$(id); if (el && el.addEventListener) el.addEventListener(evt, fn); },
+  warn: (...a) => console.warn("[ROI-DEMO]", ...a),
+  err:  (...a) => console.error("[ROI-DEMO]", ...a),
+};
+window.addEventListener("error", (e) => SAFE.err("window error:", e.message));
+window.addEventListener("unhandledrejection", (e) => SAFE.err("unhandled promise:", e.reason));
 
-  /* ==== UTM PARSING (robust) ==== */
-  const COMMON_PARAMS = ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id"];
-  function parseQuery(){
-    const out = {}; const q = location.search.startsWith("?") ? location.search.slice(1) : location.search; if(!q) return out;
-    for (const part of q.split("&")){ if(!part) continue; const [kRaw,vRaw=""]=part.split("="); const k=decodeURIComponent(kRaw||"").trim().toLowerCase(); const v=decodeURIComponent(vRaw||"").trim(); if(k) out[k]=v; }
-    return out;
+/* ===== UTM PARSING ===== */
+const COMMON_PARAMS = ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id"];
+function parseQuery(){
+  const out = {}; const q = location.search.startsWith("?") ? location.search.slice(1) : location.search; if(!q) return out;
+  for (const part of q.split("&")){ if(!part) continue; const [kRaw,vRaw=""]=part.split("="); const k=decodeURIComponent(kRaw||"").trim().toLowerCase(); const v=decodeURIComponent(vRaw||"").trim(); if(k) out[k]=v; }
+  return out;
+}
+function persistParams(){
+  const p = parseQuery(); const prev = JSON.parse(sessionStorage.getItem("params")||"{}"); const next = { ...prev };
+  for (const k of COMMON_PARAMS) if (p[k]) next[k] = p[k];
+  next.landingUrl = location.href; sessionStorage.setItem("params", JSON.stringify(next)); return next;
+}
+function getReferrer(){ return document.referrer || "(direct / none)"; }
+function campaignGrouping(params){
+  const src=(params.utm_source||"").toLowerCase(); const med=(params.utm_medium||"").toLowerCase();
+  if(params.gclid) return "google-ads"; if(params.fbclid) return "meta-ads"; if(params.msclkid) return "microsoft-ads"; if(params.li_fat_id) return "linkedin-ads";
+  if(src.includes("linkedin")) return "linkedin"; if(src.includes("google")) return "google-other"; if(src.includes("newsletter")||med==="email") return "email";
+  if(!src && !document.referrer) return "direct"; return `${src||"unknown"}-${med||"unknown"}`;
+}
+
+/* ===== DEVICE INFO ===== */
+function deviceInfo(){
+  const ua=navigator.userAgent||""; const isMobile=/Mobi|Android/i.test(ua);
+  const os=/Windows NT/i.test(ua)?"Windows":/Mac OS X/i.test(ua)?"macOS":/Android/i.test(ua)?"Android":/iPhone|iPad|iPod/i.test(ua)?"iOS":/Linux/i.test(ua)?"Linux":"Other";
+  const browser=/Chrome/i.test(ua)&&!/Edg/i.test(ua)?"Chrome":/Edg/i.test(ua)?"Edge":/Firefox/i.test(ua)?"Firefox":/Safari/i.test(ua)&&!/Chrome/i.test(ua)?"Safari":/Opera|OPR/i.test(ua)?"Opera":"Other";
+  const screenSize=`${window.screen.width}×${window.screen.height}`;
+  return { type:isMobile?"Mobile":"Desktop", os, browser, screen:screenSize, ua };
+}
+
+/* ===== GEO (fallbacks + timeout) ===== */
+function withTimeout(p,ms=3500){let t;return Promise.race([p,new Promise((_,rej)=>t=setTimeout(()=>rej(new Error("timeout")),ms))]).finally(()=>clearTimeout(t))}
+async function geoFromIpapi(){const r=await withTimeout(fetch("https://ipapi.co/json/"),3500);if(!r.ok)throw new Error("ipapi");const j=await r.json();return {ip:j.ip||null,city:j.city||null,region:j.region||null,country:j.country_name||j.country||null,org:j.org||j.asn||null};}
+async function geoFromIpwho(){const r=await withTimeout(fetch("https://ipwho.is/"),3500);if(!r.ok)throw new Error("ipwho");const j=await r.json();if(j&&j.success!==false){return {ip:j.ip||null,city:j.city||null,region:j.region||null,country:j.country||null,org:j.connection?.org||null};}throw new Error("ipwho flag");}
+async function geoFromGeoJS(){const r=await withTimeout(fetch("https://get.geojs.io/v1/ip/geo.json"),3500);if(!r.ok)throw new Error("geojs");const j=await r.json();return {ip:j.ip||null,city:j.city||null,region:j.region||null,country:j.country||null,org:j.organization_name||null};}
+async function ipOnlyIpify(){const r=await withTimeout(fetch("https://api.ipify.org?format=json"),3500);if(!r.ok)throw new Error("ipify");const j=await r.json();return {ip:j.ip||null,city:null,region:null,country:null,org:null};}
+async function geoLookup(){for(const fn of [geoFromIpapi,geoFromIpwho,geoFromGeoJS,ipOnlyIpify]){try{const g=await fn();if(g)return g;}catch(e){SAFE.warn("geo fallback",e.message)}}return {ip:null,city:null,region:null,country:null,org:null};}
+
+/* ===== SESSION METRICS ===== */
+const sessionMetrics={start:Date.now(),scrollMax:0,pageviews:1,timeline:[]};
+(function(){try{const key="pv";const cur=Number(sessionStorage.getItem(key)||"0")+1;sessionStorage.setItem(key,String(cur));sessionMetrics.pageviews=cur;}catch(e){SAFE.warn("sessionStorage?",e.message)}})();
+window.addEventListener("scroll",()=>{try{const d=Math.round(100*(window.scrollY+window.innerHeight)/document.body.scrollHeight);sessionMetrics.scrollMax=Math.min(100,Math.max(sessionMetrics.scrollMax,d));}catch(e){}});
+setInterval(()=>{const t=Math.round((Date.now()-sessionMetrics.start)/1000);sessionMetrics.timeline.push({t,depth:sessionMetrics.scrollMax});renderSession();try{updateEngageChart();}catch(e){}},1000);
+
+/* ===== RENDERERS ===== */
+function renderAcq(params){
+  SAFE.set("referrer",getReferrer()); SAFE.set("landingUrl",params.landingUrl||location.href);
+  ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id"].forEach(k=>SAFE.set(k,params[k]||"—"));
+  const group=campaignGrouping(params); SAFE.set("campaignGroup",group); try{updateSourceDonut(group)}catch(e){}
+}
+function renderDevice(d){ SAFE.set("deviceType",d.type); SAFE.set("os",d.os); SAFE.set("browser",d.browser); SAFE.set("screen",d.screen); SAFE.set("ua",d.ua); try{updateDeviceBar(d)}catch(e){} }
+function renderGeo(g){ SAFE.set("ip",g.ip); SAFE.set("city",g.city); SAFE.set("region",g.region); SAFE.set("country",g.country); SAFE.set("org",g.org); }
+function renderSession(){const elapsed=Math.round((Date.now()-sessionMetrics.start)/1000); SAFE.set("timeOnPage",`${elapsed}s`); SAFE.set("scrollDepth",`${sessionMetrics.scrollMax}%`); SAFE.set("pageviews",String(sessionMetrics.pageviews));}
+
+/* ===== CHARTS (wait for Chart.js) ===== */
+let sourceDonut,deviceBar,engageLine;
+function initCharts(){
+  if(!window.Chart){SAFE.warn("Chart.js not available");return;}
+  const brand=getComputedStyle(document.documentElement).getPropertyValue('--brand').trim()||'#15a3d4';
+  const brand2=getComputedStyle(document.documentElement).getPropertyValue('--brand2').trim()||'#06b6d4';
+  try{
+    const sd=SAFE.$('sourceDonut'); if(sd){
+      sourceDonut=new Chart(sd,{type:'doughnut',data:{labels:['google-ads','linkedin-ads','email','direct','other'],datasets:[{data:[0,0,0,0,1],backgroundColor:[brand,brand2,'#22c55e','#e5e7eb','#cbd5e1']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},cutout:'60%'}});
+    }
+    const db=SAFE.$('deviceBar'); if(db){
+      deviceBar=new Chart(db,{type:'bar',data:{labels:['Desktop/Windows','Desktop/macOS','Mobile/iOS','Mobile/Android'],datasets:[{label:'This visit',data:[0,0,0,0],backgroundColor:brand},{label:'Example mix',data:[35,25,20,20],backgroundColor:'#e2e8f0'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,ticks:{stepSize:10}}}}});
+    }
+    const el=SAFE.$('engageLine'); if(el){
+      engageLine=new Chart(el,{type:'line',data:{labels:[],datasets:[{label:'Depth %',data:[],borderColor:brand,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Seconds'}},y:{title:{display:true,text:'Scroll depth %'},suggestedMin:0,suggestedMax:100}}}});
+    }
+  }catch(e){SAFE.err("chart init failed",e);}
+}
+function updateSourceDonut(group){if(!sourceDonut)return;const map={'google-ads':0,'linkedin-ads':1,'email':2,'direct':3};const idx=map[group]??4;sourceDonut.data.datasets[0].data[idx]+=1;sourceDonut.update();}
+function updateDeviceBar(d){if(!deviceBar)return;const idx=(d.type==='Desktop'&&d.os==='Windows')?0:(d.type==='Desktop'&&d.os==='macOS')?1:(d.type==='Mobile'&&d.os==='iOS')?2:(d.type==='Mobile'&&d.os==='Android')?3:0;deviceBar.data.datasets[0].data=[0,0,0,0];deviceBar.data.datasets[0].data[idx]=1;deviceBar.update();}
+function updateEngageChart(){if(!engageLine)return;const last=sessionMetrics.timeline[sessionMetrics.timeline.length-1];if(!last)return;engageLine.data.labels.push(last.t);engageLine.data.datasets[0].data.push(last.depth);if(engageLine.data.labels.length>60){engageLine.data.labels.shift();engageLine.data.datasets[0].data.shift();}engageLine.update();}
+function waitForChart(timeoutMs=6000){
+  const start=Date.now();
+  return new Promise((resolve)=> {
+    (function poll(){
+      if (window.Chart) return resolve(true);
+      if (Date.now()-start>timeoutMs) return resolve(false);
+      requestAnimationFrame(poll);
+    })();
+  });
+}
+
+/* ===== PDF ===== */
+async function downloadPDF(){
+  try{
+    if(!window.jspdf||!window.jspdf.jsPDF) throw new Error("jsPDF unavailable");
+    const el=document.querySelector("main"); const canvas=await html2canvas(el);
+    const imgData=canvas.toDataURL("image/png"); const { jsPDF }=window.jspdf;
+    const pdf=new jsPDF({orientation:"p",unit:"pt",format:"a4"});
+    const pageW=pdf.internal.pageSize.getWidth(),pageH=pdf.internal.pageSize.getHeight();
+    const margin=24,imgW=pageW-margin*2,ratio=canvas.height/canvas.width,imgH=imgW*ratio;
+    pdf.text("Live ROI Tracking Demo",margin,28);
+    if(imgH<=pageH-60){pdf.addImage(imgData,"PNG",margin,40,imgW,imgH);}
+    else{const sliceH=pageH-80;let y=0,page=0;while(y<canvas.height){const slice=document.createElement("canvas");slice.width=canvas.width;slice.height=Math.min(sliceH*canvas.width/imgW,canvas.height-y);slice.getContext("2d").drawImage(canvas,0,y,canvas.width,slice.height,0,0,slice.width,slice.height);const img=slice.toDataURL("image/png");if(page>0)pdf.addPage();pdf.addImage(img,"PNG",margin,40,imgW,(slice.height/canvas.width)*imgW);y+=slice.height;page++;}} 
+    pdf.save("Live_Tracking_Report.pdf");
+  }catch(e){SAFE.warn("PDF export skipped:",e.message);}
+}
+SAFE.on("downloadPdfBtn","click",downloadPDF);
+
+/* ===== SALESFORCE TABS + RENDER HOOK ===== */
+document.addEventListener("click",(e)=>{
+  const btn=e.target.closest(".sf-tab"); if(!btn) return;
+  document.querySelectorAll(".sf-tab").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelectorAll(".sf-pane").forEach(p=>p.hidden=true);
+  const pane=document.getElementById(btn.dataset.tab); if(pane) pane.hidden=false;
+});
+
+window.__renderSalesforcePreview=function(params,dev,geo){
+  // Lead
+  const name="Taylor Example", company=geo?.org||"Acme Corp", email="taylor@example.com";
+  const leadSource=campaignGrouping(params);
+  const detail=[params.utm_source,params.utm_medium,params.utm_campaign].filter(Boolean).join(" / ")||"(none)";
+  const clickIds=["gclid","fbclid","msclkid","ttclid","li_fat_id"].filter(k=>params[k]).map(k=>`${k}=${params[k]}`).join("  •  ")||"(none)";
+  const geoLine=[geo?.city,geo?.region,geo?.country].filter(Boolean).join(", ");
+  SAFE.set("sfLeadName",name); SAFE.set("sfLeadCompany",company); SAFE.set("sfLeadEmail",email);
+  SAFE.set("sfLeadSource",leadSource); SAFE.set("sfLeadSourceDetail",detail);
+  SAFE.set("sfUtmSource",params.utm_source||"—"); SAFE.set("sfUtmMedium",params.utm_medium||"—"); SAFE.set("sfUtmCampaign",params.utm_campaign||"—");
+  SAFE.set("sfClickIds",clickIds); SAFE.set("sfDevice",`${dev?.type} • ${dev?.os} • ${dev?.browser} • ${dev?.screen}`);
+  SAFE.set("sfGeo",`${geo?.ip||"—"} • ${geoLine||"—"}`); SAFE.set("sfCreated",new Date().toLocaleString());
+
+  // Campaign Member
+  const cmCampaign=params.utm_campaign||"CRMH – ROI Demo";
+  const touchRole=params.gclid||params.li_fat_id?"Last Touch":"Assist"; const attribPct=touchRole==="Last Touch"?100:25;
+  const accountName=company;
+  const cmUtms=JSON.stringify({utm_source:params.utm_source||null,utm_medium:params.utm_medium||null,utm_campaign:params.utm_campaign||null,gclid:params.gclid||null,li_fat_id:params.li_fat_id||null});
+  SAFE.set("sfCmName",name); SAFE.set("sfCampaign",cmCampaign); SAFE.set("sfMemberStatus","Responded");
+  SAFE.set("sfTouchRole",touchRole); SAFE.set("sfAttribPct",attribPct+"%"); SAFE.set("sfAccount",accountName); SAFE.set("sfCmUtms",cmUtms);
+
+  // Opportunity snapshot + attribution models
+  const oppName=`${accountName} — RevOps Implementation`; const amount=25000;
+  const touches=[
+    {name:"ROI Demo – Google Ads", role:"First", weightFT:1, weightLT:0, weightW:.3, weightLIN:.25},
+    {name:"ROI Ebook – LinkedIn",  role:"Assist",weightFT:0, weightLT:0, weightW:.1, weightLIN:.25},
+    {name:"ROI Webinar – Email",   role:"Lead",  weightFT:0, weightLT:0, weightW:.3, weightLIN:.25},
+    {name:cmCampaign,              role:"Last",  weightFT:0, weightLT:1, weightW:.3, weightLIN:.25}
+  ];
+  const revFT=Math.round(amount*touches.reduce((s,t)=>s+t.weightFT ,0));
+  const revLT=Math.round(amount*touches.reduce((s,t)=>s+t.weightLT ,0));
+  const revLIN=Math.round(amount*touches.reduce((s,t)=>s+t.weightLIN,0));
+  const revW=Math.round(amount*touches.reduce((s,t)=>s+t.weightW  ,0));
+  SAFE.set("sfOppName",oppName); SAFE.set("sfOppAccount",accountName);
+  SAFE.set("sfOppAmount",amount.toLocaleString('en-US',{style:'currency',currency:'USD'}));
+  SAFE.set("sfOppStage","Negotiation/Review");
+  SAFE.set("sfPrimaryCampaign",cmCampaign);
+  SAFE.set("sfLT",revLT.toLocaleString('en-US',{style:'currency',currency:'USD'}));
+  SAFE.set("sfFT",revFT.toLocaleString('en-US',{style:'currency',currency:'USD'}));
+  SAFE.set("sfLIN",revLIN.toLocaleString('en-US',{style:'currency',currency:'USD'}));
+  SAFE.set("sfW",revW.toLocaleString('en-US',{style:'currency',currency:'USD'}));
+
+  // Reports table + charts
+  const sampleCampaigns=[
+    {name:"ROI Demo – Google Ads", spend:1200, pipeline:48000, revenue:revFT,  model:"First Touch"},
+    {name:"ROI Ebook – LinkedIn",  spend: 800, pipeline:22000, revenue:Math.round(amount*0.10), model:"Assist/Linear"},
+    {name:"ROI Webinar – Email",   spend: 300, pipeline:15000, revenue:Math.round(amount*0.20), model:"W-Shaped"},
+    {name:cmCampaign,              spend:1000, pipeline:30000, revenue:revLT,  model:"Last Touch"}
+  ];
+  const tbody=document.querySelector("#roiTable tbody"); if(tbody){tbody.innerHTML=""; sampleCampaigns.forEach(c=>{const roi=((c.revenue-c.spend)/Math.max(1,c.spend))*100; const tr=document.createElement("tr"); tr.innerHTML=`<td>${c.name}</td><td>${c.spend.toLocaleString('en-US',{style:'currency',currency:'USD'})}</td><td>${c.pipeline.toLocaleString('en-US',{style:'currency',currency:'USD'})}</td><td>${c.revenue.toLocaleString('en-US',{style:'currency',currency:'USD'})}</td><td>${roi.toFixed(0)}%</td><td>${c.model}</td>`; tbody.appendChild(tr);});}
+  if(window.Chart){
+    const barCtx=document.getElementById("modelBar"); if(barCtx){new Chart(barCtx,{type:'bar',data:{labels:['First-Touch','Last-Touch','Linear','W-Shaped'],datasets:[{label:'Revenue $',data:[revFT,revLT,revLIN,revW],backgroundColor:['#94c6e1','#15a3d4','#8bd3dd','#06b6d4']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});}
+    const doughCtx=document.getElementById("touchDist"); if(doughCtx){new Chart(doughCtx,{type:'doughnut',data:{labels:['First','Assist','Lead','Last'],datasets:[{data:[1,1,1,1],backgroundColor:['#15a3d4','#8bd3dd','#a7f3d0','#e2e8f0']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},cutout:'60%'}});}
   }
-  function persistParams(){
-    const p = parseQuery(); const prev = JSON.parse(sessionStorage.getItem("params")||"{}"); const next = { ...prev };
-    for (const k of COMMON_PARAMS) if (p[k]) next[k] = p[k];
-    next.landingUrl = location.href; sessionStorage.setItem("params", JSON.stringify(next)); return next;
-  }
-  function getReferrer(){ return document.referrer || "(direct / none)"; }
-  function campaignGrouping(params){
-    const src=(params.utm_source||"").toLowerCase(); const med=(params.utm_medium||"").toLowerCase();
-    if(params.gclid) return "google-ads"; if(params.fbclid) return "meta-ads"; if(params.msclkid) return "microsoft-ads"; if(params.li_fat_id) return "linkedin-ads";
-    if(src.includes("linkedin")) return "linkedin"; if(src.includes("google")) return "google-other"; if(src.includes("newsletter")||med==="email") return "email";
-    if(!src && !document.referrer) return "direct"; return `${src||"unknown"}-${med||"unknown"}`;
-  }
+};
 
-  /* ==== Device info ==== */
-  function deviceInfo(){
-    const ua=navigator.userAgent||""; const isMobile=/Mobi|Android/i.test(ua);
-    const os=/Windows NT/i.test(ua)?"Windows":/Mac OS X/i.test(ua)?"macOS":/Android/i.test(ua)?"Android":/iPhone|iPad|iPod/i.test(ua)?"iOS":/Linux/i.test(ua)?"Linux":"Other";
-    const browser=/Chrome/i.test(ua)&&!/Edg/i.test(ua)?"Chrome":/Edg/i.test(ua)?"Edge":/Firefox/i.test(ua)?"Firefox":/Safari/i.test(ua)&&!/Chrome/i.test(ua)?"Safari":/Opera|OPR/i.test(ua)?"Opera":"Other";
-    const screenSize=`${window.screen.width}×${window.screen.height}`;
-    return { type:isMobile?"Mobile":"Desktop", os, browser, screen:screenSize, ua };
-  }
+/* ===== INIT (ensure Chart loaded first) ===== */
+(async function init(){
+  try{
+    const params=persistParams();
+    const dev=deviceInfo();
+    renderAcq(params); renderDevice(dev);
+    try { const geo=await geoLookup(); renderGeo(geo); } catch(e){ SAFE.warn("geo failed",e.message); }
 
-  /* ==== Geo IP (fallbacks + timeout) ==== */
-  function withTimeout(p,ms=3500){let t;return Promise.race([p,new Promise((_,rej)=>t=setTimeout(()=>rej(new Error("timeout")),ms))]).finally(()=>clearTimeout(t))}
-  async function geoFromIpapi(){const r=await withTimeout(fetch("https://ipapi.co/json/"),3500);if(!r.ok)throw new Error("ipapi");const j=await r.json();return {ip:j.ip||null,city:j.city||null,region:j.region||null,country:j.country_name||j.country||null,org:j.org||j.asn||null};}
-  async function geoFromIpwho(){const r=await withTimeout(fetch("https://ipwho.is/"),3500);if(!r.ok)throw new Error("ipwho");const j=await r.json();if(j&&j.success!==false){return {ip:j.ip||null,city:j.city||null,region:j.region||null,country:j.country||null,org:j.connection?.org||null};}throw new Error("ipwho flag");}
-  async function geoFromGeoJS(){const r=await withTimeout(fetch("https://get.geojs.io/v1/ip/geo.json"),3500);if(!r.ok)throw new Error("geojs");const j=await r.json();return {ip:j.ip||null,city:j.city||null,region:j.region||null,country:j.country||null,org:j.organization_name||null};}
-  async function ipOnlyIpify(){const r=await withTimeout(fetch("https://api.ipify.org?format=json"),3500);if(!r.ok)throw new Error("ipify");const j=await r.json();return {ip:j.ip||null,city:null,region:null,country:null,org:null};}
-  async function geoLookup(){for(const fn of [geoFromIpapi,geoFromIpwho,geoFromGeoJS,ipOnlyIpify]){try{const g=await fn();if(g)return g;}catch(e){SAFE.warn("geo fallback",e.message)}}return {ip:null,city:null,region:null,country:null,org:null};}
+    // Wait for Chart.js if CDN is slow
+    const ok = await waitForChart(7000);
+    if(!ok) SAFE.warn("Chart.js not ready; skipping initCharts");
+    else initCharts();
 
-  /* ==== Session metrics ==== */
-  const sessionMetrics={start:Date.now(),scrollMax:0,pageviews:1,timeline:[]};
-  (function(){try{const key="pv";const cur=Number(sessionStorage.getItem(key)||"0")+1;sessionStorage.setItem(key,String(cur));sessionMetrics.pageviews=cur;}catch(e){SAFE.warn("sessionStorage?",e.message)}})();
-  window.addEventListener("scroll",()=>{try{const d=Math.round(100*(window.scrollY+window.innerHeight)/document.body.scrollHeight);sessionMetrics.scrollMax=Math.min(100,Math.max(sessionMetrics.scrollMax,d));}catch(e){}});
-  setInterval(()=>{const t=Math.round((Date.now()-sessionMetrics.start)/1000);sessionMetrics.timeline.push({t,depth:sessionMetrics.scrollMax});renderSession();try{updateEngageChart();}catch(e){}},1000);
-
-  /* ==== Renderers ==== */
-  function renderAcq(params){
-    SAFE.set("referrer",getReferrer()); SAFE.set("landingUrl",params.landingUrl||location.href);
-    ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id"].forEach(k=>SAFE.set(k,params[k]||"—"));
-    const group=campaignGrouping(params); SAFE.set("campaignGroup",group); try{updateSourceDonut(group)}catch(e){}
-  }
-  function renderDevice(d){ SAFE.set("deviceType",d.type); SAFE.set("os",d.os); SAFE.set("browser",d.browser); SAFE.set("screen",d.screen); SAFE.set("ua",d.ua); try{updateDeviceBar(d)}catch(e){} }
-  function renderGeo(g){ SAFE.set("ip",g.ip); SAFE.set("city",g.city); SAFE.set("region",g.region); SAFE.set("country",g.country); SAFE.set("org",g.org); }
-  function renderSession(){const elapsed=Math.round((Date.now()-sessionMetrics.start)/1000); SAFE.set("timeOnPage",`${elapsed}s`); SAFE.set("scrollDepth",`${sessionMetrics.scrollMax}%`); SAFE.set("pageviews",String(sessionMetrics.pageviews));}
-
-  /* ==== Charts ==== */
-  let sourceDonut,deviceBar,engageLine;
-  function initCharts(){
-    if(!window.Chart){SAFE.warn("Chart.js not available");return;}
-    const brand=getComputedStyle(document.documentElement).getPropertyValue('--brand').trim()||'#15a3d4';
-    const brand2=getComputedStyle(document.documentElement).getPropertyValue('--brand2').trim()||'#06b6d4';
-    sourceDonut=new Chart(SAFE.$('sourceDonut'),{type:'doughnut',data:{labels:['google-ads','linkedin-ads','email','direct','other'],datasets:[{data:[0,0,0,0,1],backgroundColor:[brand,brand2,'#22c55e','#e5e7eb','#cbd5e1']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},cutout:'60%'}});
-    deviceBar=new Chart(SAFE.$('deviceBar'),{type:'bar',data:{labels:['Desktop/Windows','Desktop/macOS','Mobile/iOS','Mobile/Android'],datasets:[{label:'This visit',data:[0,0,0,0],backgroundColor:brand},{label:'Example mix',data:[35,25,20,20],backgroundColor:'#e2e8f0'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,ticks:{stepSize:10}}}}});
-    engageLine=new Chart(SAFE.$('engageLine'),{type:'line',data:{labels:[],datasets:[{label:'Depth %',data:[],borderColor:brand,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Seconds'}},y:{title:{display:true,text:'Scroll depth %'},suggestedMin:0,suggestedMax:100}}}});
-  }
-  function updateSourceDonut(group){if(!sourceDonut)return;const map={'google-ads':0,'linkedin-ads':1,'email':2,'direct':3};const idx=map[group]??4;sourceDonut.data.datasets[0].data[idx]+=1;sourceDonut.update();}
-  function updateDeviceBar(d){if(!deviceBar)return;const idx=(d.type==='Desktop'&&d.os==='Windows')?0:(d.type==='Desktop'&&d.os==='macOS')?1:(d.type==='Mobile'&&d.os==='iOS')?2:(d.type==='Mobile'&&d.os==='Android')?3:0;deviceBar.data.datasets[0].data=[0,0,0,0];deviceBar.data.datasets[0].data[idx]=1;deviceBar.update();}
-  function updateEngageChart(){if(!engageLine)return;const last=sessionMetrics.timeline[sessionMetrics.timeline.length-1];if(!last)return;engageLine.data.labels.push(last.t);engageLine.data.datasets[0].data.push(last.depth);if(engageLine.data.labels.length>60){engageLine.data.labels.shift();engageLine.data.datasets[0].data.shift();}engageLine.update();}
-
-  /* ==== PDF ==== */
-  async function downloadPDF(){
-    try{
-      if(!window.jspdf||!window.jspdf.jsPDF) throw new Error("jsPDF unavailable");
-      const el=document.querySelector("main"); const canvas=await html2canvas(el); const imgData=canvas.toDataURL("image/png"); const { jsPDF }=window.jspdf;
-      const pdf=new jsPDF({orientation:"p",unit:"pt",format:"a4"}); const pageW=pdf.internal.pageSize.getWidth(),pageH=pdf.internal.pageSize.getHeight();
-      const margin=24,imgW=pageW-margin*2,ratio=canvas.height/canvas.width,imgH=imgW*ratio; pdf.text("Live ROI Tracking Demo",margin,28);
-      if(imgH<=pageH-60){pdf.addImage(imgData,"PNG",margin,40,imgW,imgH);}else{const sliceH=pageH-80;let y=0,page=0;while(y<canvas.height){const slice=document.createElement("canvas");slice.width=canvas.width;slice.height=Math.min(sliceH*canvas.width/imgW,canvas.height-y);slice.getContext("2d").drawImage(canvas,0,y,canvas.width,slice.height,0,0,slice.width,slice.height);const img=slice.toDataURL("image/png");if(page>0)pdf.addPage();pdf.addImage(img,"PNG",margin,40,imgW,(slice.height/canvas.width)*imgW);y+=slice.height;page++;}} pdf.save("Live_Tracking_Report.pdf");
-    }catch(e){SAFE.warn("PDF export skipped:",e.message);}
-  }
-  SAFE.on("downloadPdfBtn","click",downloadPDF);
-
-  /* ==== Salesforce preview glue (tabs + populate) ==== */
-  (function(){
-    // tab logic
-    document.addEventListener("click",(e)=>{
-      const btn=e.target.closest(".sf-tab"); if(!btn) return;
-      document.querySelectorAll(".sf-tab").forEach(b=>b.classList.remove("active"));
-      btn.classList.add("active");
-      document.querySelectorAll(".sf-pane").forEach(p=>p.hidden=true);
-      const pane=document.getElementById(btn.dataset.tab); if(pane) pane.hidden=false;
-    });
-
-    // render hook
-    window.__renderSalesforcePreview=function(params,dev,geo){
-      // Lead
-      const name="Taylor Example", company=geo?.org||"Acme Corp", email="taylor@example.com";
-      const leadSource=campaignGrouping(params);
-      const detail=[params.utm_source,params.utm_medium,params.utm_campaign].filter(Boolean).join(" / ")||"(none)";
-      const clickIds=["gclid","fbclid","msclkid","ttclid","li_fat_id"].filter(k=>params[k]).map(k=>`${k}=${params[k]}`).join("  •  ")||"(none)";
-      const geoLine=[geo?.city,geo?.region,geo?.country].filter(Boolean).join(", ");
-      SAFE.set("sfLeadName",name); SAFE.set("sfLeadCompany",company); SAFE.set("sfLeadEmail",email);
-      SAFE.set("sfLeadSource",leadSource); SAFE.set("sfLeadSourceDetail",detail);
-      SAFE.set("sfUtmSource",params.utm_source||"—"); SAFE.set("sfUtmMedium",params.utm_medium||"—"); SAFE.set("sfUtmCampaign",params.utm_campaign||"—");
-      SAFE.set("sfClickIds",clickIds); SAFE.set("sfDevice",`${dev?.type} • ${dev?.os} • ${dev?.browser} • ${dev?.screen}`);
-      SAFE.set("sfGeo",`${geo?.ip||"—"} • ${geoLine||"—"}`); SAFE.set("sfCreated",new Date().toLocaleString());
-
-      // Campaign Member (sample multi-touch)
-      const cmCampaign=params.utm_campaign||"CRMH – ROI Demo";
-      const touchRole=params.gclid||params.li_fat_id?"Last Touch":"Assist"; const attribPct=touchRole==="Last Touch"?100:25;
-      const accountName=company;
-      const cmUtms=JSON.stringify({utm_source:params.utm_source||null,utm_medium:params.utm_medium||null,utm_campaign:params.utm_campaign||null,gclid:params.gclid||null,li_fat_id:params.li_fat_id||null});
-      SAFE.set("sfCmName",name); SAFE.set("sfCampaign",cmCampaign); SAFE.set("sfMemberStatus","Responded");
-      SAFE.set("sfTouchRole",touchRole); SAFE.set("sfAttribPct",attribPct+"%"); SAFE.set("sfAccount",accountName); SAFE.set("sfCmUtms",cmUtms);
-
-      // Opportunity snapshot + attribution models
-      const oppName=`${accountName} — RevOps Implementation`; const amount=25000;
-      const touches=[
-        {name:"ROI Demo – Google Ads", role:"First", weightFT:1, weightLT:0, weightW:.3, weightLIN:.25},
-        {name:"ROI Ebook – LinkedIn",  role:"Assist",weightFT:0, weightLT:0, weightW:.1, weightLIN:.25},
-        {name:"ROI Webinar – Email",   role:"Lead",  weightFT:0, weightLT:0, weightW:.3, weightLIN:.25},
-        {name:cmCampaign,              role:"Last",  weightFT:0, weightLT:1, weightW:.3, weightLIN:.25}
-      ];
-      const revFT=Math.round(amount*touches.reduce((s,t)=>s+t.weightFT ,0));
-      const revLT=Math.round(amount*touches.reduce((s,t)=>s+t.weightLT ,0));
-      const revLIN=Math.round(amount*touches.reduce((s,t)=>s+t.weightLIN,0));
-      const revW=Math.round(amount*touches.reduce((s,t)=>s+t.weightW  ,0));
-      SAFE.set("sfOppName",oppName); SAFE.set("sfOppAccount",accountName);
-      SAFE.set("sfOppAmount",amount.toLocaleString('en-US',{style:'currency',currency:'USD'}));
-      SAFE.set("sfOppStage","Negotiation/Review");
-      SAFE.set("sfPrimaryCampaign",cmCampaign);
-      SAFE.set("sfLT",revLT.toLocaleString('en-US',{style:'currency',currency:'USD'}));
-      SAFE.set("sfFT",revFT.toLocaleString('en-US',{style:'currency',currency:'USD'}));
-      SAFE.set("sfLIN",revLIN.toLocaleString('en-US',{style:'currency',currency:'USD'}));
-      SAFE.set("sfW",revW.toLocaleString('en-US',{style:'currency',currency:'USD'}));
-
-      // Reports (table + charts)
-      const sampleCampaigns=[
-        {name:"ROI Demo – Google Ads", spend:1200, pipeline:48000, revenue:revFT,  model:"First Touch"},
-        {name:"ROI Ebook – LinkedIn",  spend: 800, pipeline:22000, revenue:Math.round(amount*0.10), model:"Assist/Linear"},
-        {name:"ROI Webinar – Email",   spend: 300, pipeline:15000, revenue:Math.round(amount*0.20), model:"W-Shaped"},
-        {name:cmCampaign,              spend:1000, pipeline:30000, revenue:revLT,  model:"Last Touch"}
-      ];
-      const tbody=document.querySelector("#roiTable tbody"); if(tbody){tbody.innerHTML=""; sampleCampaigns.forEach(c=>{const roi=((c.revenue-c.spend)/Math.max(1,c.spend))*100; const tr=document.createElement("tr"); tr.innerHTML=`<td>${c.name}</td><td>${c.spend.toLocaleString('en-US',{style:'currency',currency:'USD'})}</td><td>${c.pipeline.toLocaleString('en-US',{style:'currency',currency:'USD'})}</td><td>${c.revenue.toLocaleString('en-US',{style:'currency',currency:'USD'})}</td><td>${roi.toFixed(0)}%</td><td>${c.model}</td>`; tbody.appendChild(tr);});}
-      if(window.Chart){
-        const barCtx=document.getElementById("modelBar"); if(barCtx){new Chart(barCtx,{type:'bar',data:{labels:['First-Touch','Last-Touch','Linear','W-Shaped'],datasets:[{label:'Revenue $',data:[revFT,revLT,revLIN,revW],backgroundColor:['#94c6e1','#15a3d4','#8bd3dd','#06b6d4']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});}
-        const doughCtx=document.getElementById("touchDist"); if(doughCtx){new Chart(doughCtx,{type:'doughnut',data:{labels:touches.map(t=>t.role),datasets:[{data:touches.map(()=>1),backgroundColor:['#15a3d4','#8bd3dd','#a7f3d0','#e2e8f0']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},cutout:'60%'}});}
-      }
-    };
-  })();
-
-  /* ==== INIT ==== */
-  (async function init(){
-    initCharts();
-    const params=persistParams(); renderAcq(params);
-    const dev=deviceInfo();       renderDevice(dev);
-    try{ const geo=await geoLookup(); renderGeo(geo); if(window.__renderSalesforcePreview){window.__renderSalesforcePreview(params,dev,geo);} }
-    catch(e){ SAFE.warn("geo failed",e.message); if(window.__renderSalesforcePreview){window.__renderSalesforcePreview(params,dev,{});} }
+    // Salesforce preview
+    if(window.__renderSalesforcePreview){
+      const geo = { ip: SAFE.$('ip')?.textContent || null, city: SAFE.$('city')?.textContent || null, region: SAFE.$('region')?.textContent || null, country: SAFE.$('country')?.textContent || null, org: SAFE.$('org')?.textContent || null };
+      window.__renderSalesforcePreview(params,dev,geo);
+    }
 
     // Demo projection
     SAFE.set("projCost","$4.00"); SAFE.set("projPipe","$12,000"); SAFE.set("projClose","21%"); SAFE.set("projRev","$2,520");
-  })();
-  </script>
+  }catch(e){ SAFE.err("init failed", e); }
+})();
+</script>
+
 </body>
 </html>
