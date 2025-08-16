@@ -14,15 +14,6 @@
     --brand:#e41414; --brand-ink:#000; --brand-soft:#ffe5e5;
     --radius:14px; --shadow:0 8px 24px rgba(0,0,0,.06);
   }
-
-  /* Compact, full-width Click IDs row */
-.cid-grid{
-  display:grid; gap:8px;
-  grid-template-columns: repeat(5, minmax(140px, 1fr));
-}
-@media (max-width: 980px){ .cid-grid{ grid-template-columns: repeat(3, minmax(140px,1fr)); } }
-@media (max-width: 640px){ .cid-grid{ grid-template-columns: repeat(1, minmax(140px,1fr)); } }
-
   *{box-sizing:border-box}
   html,body{height:100%;overflow-x:hidden}
   body{margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
@@ -101,6 +92,14 @@
   /* Utilities */
   table{width:100%;border-collapse:collapse}
   th,td{padding:6px;border-bottom:1px solid var(--line);text-align:left;word-break:break-word;overflow-wrap:anywhere}
+
+  /* Compact, full-width Click IDs row */
+  .cid-grid{
+    display:grid; gap:8px;
+    grid-template-columns: repeat(5, minmax(140px, 1fr));
+  }
+  @media (max-width: 980px){ .cid-grid{ grid-template-columns: repeat(3, minmax(140px,1fr)); } }
+  @media (max-width: 640px){ .cid-grid{ grid-template-columns: repeat(1, minmax(140px,1fr)); } }
 </style>
 
 <!-- CDNs -->
@@ -131,7 +130,7 @@
       </div>
     </div>
     <div>
-      <div class="kicker">Outcome‑first</div>
+      <div class="kicker">Outcome-first</div>
       <h1 class="h1">Your results up top. The how below.</h1>
       <p class="sub">Instant dashboards + Salesforce preview from your click. Then we unpack every signal and how to act on it.</p>
     </div>
@@ -139,7 +138,7 @@
 </header>
 
 <main class="container">
-  <div class="notice">Free‑only signals: UTMs/click IDs, referrer, device, IP geo, and on‑page engagement. Add <code>?demo_enrich=1</code> to simulate firmographic/intent enrichment (no paid API).</div>
+  <div class="notice">Free-only signals: UTMs/click IDs, referrer, device, IP geo, and on-page engagement. Add <code>?demo_enrich=1</code> to simulate firmographic/intent enrichment (no paid API).</div>
 
   <!-- ================== OUTCOMES FIRST ================== -->
 
@@ -178,7 +177,7 @@
 
   <!-- Quick Dashboards -->
   <section class="section">
-    <div class="section-title"><div><div class="kicker">Dashboards</div><h2 class="h2">At‑a‑glance performance</h2></div></div>
+    <div class="section-title"><div><div class="kicker">Dashboards</div><h2 class="h2">At-a-glance performance</h2></div></div>
     <div class="chart-grid cols-3">
       <div class="card"><div class="kicker">Source Grouping</div><canvas id="sourceDonut"></canvas><p class="sub">Buckets from your UTMs/click IDs.</p></div>
       <div class="card"><div class="kicker">Device & OS</div><canvas id="deviceBar"></canvas><p class="sub">Your environment vs. example mix.</p></div>
@@ -292,104 +291,110 @@
     </div>
   </section>
 
-  <!-- Quick “Do This Today” -->
+  <!-- Do This Today -->
   <section class="section">
     <div class="section-title"><div><div class="kicker">Do this today</div><h2 class="h2">5 free moves that raise ROI clarity</h2></div></div>
     <div class="tiles cols-4" style="margin-top:8px">
       <div class="tile"><h3>Normalize UTMs</h3><div class="why"><strong>Why:</strong> Dirty taxonomy = broken reports.</div><div class="do"><strong>Take action:</strong> Standardize <code>utm_source</code>/<code>utm_medium</code> list; reject anything else at form submit.</div></div>
       <div class="tile"><h3>Stamp on Lead</h3><div class="why"><strong>Why:</strong> Attribution survives handoffs.</div><div class="do"><strong>Take action:</strong> Hidden fields for UTMs + referrer + landing URL; write to Lead & Campaign Member.</div></div>
-      <div class="tile"><h3>Click‑ID Capture</h3><div class="why"><strong>Why:</strong> Offline conversions back to platforms.</div><div class="do"><strong>Take action:</strong> Store <code>gclid</code>/<code>li_fat_id</code>/etc. and send on closed‑won.</div></div>
+      <div class="tile"><h3>Click-ID Capture</h3><div class="why"><strong>Why:</strong> Offline conversions back to platforms.</div><div class="do"><strong>Take action:</strong> Store <code>gclid</code>/<code>li_fat_id</code>/etc. and send on closed-won.</div></div>
       <div class="tile"><h3>Engagement Score</h3><div class="why"><strong>Why:</strong> No cookies needed.</div><div class="do"><strong>Take action:</strong> Score ≥60s time + ≥60% scroll as “Hot” → SDR alert.</div></div>
       <div class="tile"><h3>Single Truth</h3><div class="why"><strong>Why:</strong> Stop dashboard arguments.</div><div class="do"><strong>Take action:</strong> Choose one model (LT/FT/Linear/W) and lock it for Q.</div></div>
       <div class="tile"><h3>Govern Redirects</h3><div class="why"><strong>Why:</strong> UTMs often drop.</div><div class="do"><strong>Take action:</strong> Preserve query strings through any vanity/redirect links.</div></div>
-      <div class="tile"><h3>Geo Routing</h3><div class="why"><strong>Why:</strong> Faster follow‑up.</div><div class="do"><strong>Take action:</strong> Use free IP city/region for territory routing when form is blank.</div></div>
+      <div class="tile"><h3>Geo Routing</h3><div class="why"><strong>Why:</strong> Faster follow-up.</div><div class="do"><strong>Take action:</strong> Use free IP city/region for territory routing when form is blank.</div></div>
       <div class="tile"><h3>ABM Match (Optional)</h3><div class="why"><strong>Why:</strong> Better account focus.</div><div class="do"><strong>Take action:</strong> Try <code>?demo_enrich=1</code> to see firmographics fields you’ll map when you add enrichment.</div></div>
     </div>
   </section>
 
   <!-- ================== DETAILS AFTER OUTCOMES ================== -->
 
- <!-- ACQUISITION (reordered: UTM + Campaign Group inline, Click IDs full-width) -->
-<section class="section">
-  <div class="section-title">
-    <div>
-      <div class="kicker">Acquisition & Attribution</div>
-      <h2 class="h2">Where did this click come from?</h2>
-      <p class="lead">Compact tiles; long values wrap fully. Perfect for Salesforce field stamping and platform de-dupe.</p>
-    </div>
-  </div>
-
-  <!-- Row 1: Referrer + Landing URL + Source + Medium -->
-  <div class="tiles cols-4" style="margin-top:8px">
-    <div class="tile">
-      <h3>Referrer</h3>
-      <div class="kv"><label>value</label><code id="referrer">—</code></div>
-      <p class="why"><strong>Why:</strong> Separate paid/organic/partner/direct.<br><strong>Take action:</strong> Investigate “Direct” spikes—usually dropped UTMs.</p>
-    </div>
-    <div class="tile">
-      <h3>Landing URL</h3>
-      <div class="kv"><label>value</label><code id="landingUrl">—</code></div>
-      <p class="why"><strong>Why:</strong> Persist UTMs across steps/sessions.<br><strong>Take action:</strong> Re-append stored UTMs on form pages.</p>
-    </div>
-    <div class="tile">
-      <h3>utm_source</h3>
-      <div class="kv"><label>value</label><code id="utm_source">—</code></div>
-      <p class="why"><strong>Why:</strong> Primary channel grouping.<br><strong>Take action:</strong> Enforce lowercase and a whitelist.</p>
-    </div>
-    <div class="tile">
-      <h3>utm_medium</h3>
-      <div class="kv"><label>value</label><code id="utm_medium">—</code></div>
-      <p class="why"><strong>Why:</strong> Traffic type (cpc/social/email).<br><strong>Take action:</strong> Map platform labels into your standard set.</p>
-    </div>
-
-    <!-- Row 2: Campaign + Content + Term + Campaign Group (inline with UTM tiles) -->
-    <div class="tile">
-      <h3>utm_campaign</h3>
-      <div class="kv"><label>value</label><code id="utm_campaign">—</code></div>
-      <p class="why"><strong>Why:</strong> Budget/goal unit.<br><strong>Take action:</strong> Prefix with channel & quarter (e.g., <code>li_q3_roi_demo</code>).</p>
-    </div>
-    <div class="tile">
-      <h3>utm_content</h3>
-      <div class="kv"><label>value</label><code id="utm_content">—</code></div>
-      <p class="why"><strong>Why:</strong> Creative/variant for A/Bs.<br><strong>Take action:</strong> Use short IDs tied to a creative library.</p>
-    </div>
-    <div class="tile">
-      <h3>utm_term</h3>
-      <div class="kv"><label>value</label><code id="utm_term">—</code></div>
-      <p class="why"><strong>Why:</strong> Keyword insights.<br><strong>Take action:</strong> Weekly negation/expansion by **ROI**, not CPC.</p>
-    </div>
-    <div class="tile">
-      <h3>Campaign Group</h3>
-      <div class="kv"><label>value</label><code id="campaignGroup">—</code></div>
-      <p class="why"><strong>Why:</strong> Quick channel dashboards.<br><strong>Take action:</strong> Auto-derive from UTMs/click IDs on capture.</p>
-    </div>
-
-    <!-- Row 3: Click IDs (full width of 4 columns) -->
-    <div class="tile" style="grid-column:span 4">
-      <h3>Click IDs (Full-Width)</h3>
-      <div class="cid-grid">
-        <div class="kv"><label>gclid</label><code id="gclid">—</code></div>
-        <div class="kv"><label>fbclid</label><code id="fbclid">—</code></div>
-        <div class="kv"><label>msclkid</label><code id="msclkid">—</code></div>
-        <div class="kv"><label>ttclid</label><code id="ttclid">—</code></div>
-        <div class="kv"><label>li_fat_id</label><code id="li_fat_id">—</code></div>
+  <!-- Acquisition & Attribution (UTM + Campaign Group inline, Click IDs full width) -->
+  <section class="section">
+    <div class="section-title">
+      <div>
+        <div class="kicker">Acquisition & Attribution</div>
+        <h2 class="h2">The signals that power ROI</h2>
       </div>
-      <p class="why" style="margin-top:6px"><strong>Why:</strong> Join keys for offline conversions and lift studies.<br>
-      <strong>Take action:</strong> On Closed-Won, push attributed revenue back to each platform using its click ID to improve bidding.</p>
     </div>
-  </div>
-</section>
 
+    <!-- Row 1 -->
+    <div class="tiles cols-4" style="margin-top:8px">
+      <div class="tile">
+        <h3>Referrer</h3>
+        <div class="kv"><label>value</label><code id="referrer">—</code></div>
+        <p class="why"><strong>Why:</strong> Distinguishes paid/organic/partner/direct.</p>
+        <div class="do"><strong>Take action:</strong> Investigate any spike in Direct with unchanged spend—usually UTMs dropped.</div>
+      </div>
+      <div class="tile">
+        <h3>Landing URL</h3>
+        <div class="kv"><label>value</label><code id="landingUrl">—</code></div>
+        <p class="why"><strong>Why:</strong> Keeps UTMs intact across steps/sessions.</p>
+        <div class="do"><strong>Take action:</strong> Persist UTMs and re-append on form pages.</div>
+      </div>
+      <div class="tile">
+        <h3>utm_source</h3>
+        <div class="kv"><label>value</label><code id="utm_source">—</code></div>
+        <p class="why"><strong>Why:</strong> Primary channel grouping.</p>
+        <div class="do"><strong>Take action:</strong> Enforce lowercase, whitelist values.</div>
+      </div>
+      <div class="tile">
+        <h3>utm_medium</h3>
+        <div class="kv"><label>value</label><code id="utm_medium">—</code></div>
+        <p class="why"><strong>Why:</strong> Traffic type (cpc/social/email).</p>
+        <div class="do"><strong>Take action:</strong> Map platform labels into your standard set.</div>
+      </div>
+
+      <!-- Row 2 (UTM + Campaign Group inline) -->
+      <div class="tile">
+        <h3>utm_campaign</h3>
+        <div class="kv"><label>value</label><code id="utm_campaign">—</code></div>
+        <p class="why"><strong>Why:</strong> Budget/goal unit.</p>
+        <div class="do"><strong>Take action:</strong> Prefix with channel & quarter (e.g., <code>li_q3_roi_demo</code>).</div>
+      </div>
+      <div class="tile">
+        <h3>utm_content</h3>
+        <div class="kv"><label>value</label><code id="utm_content">—</code></div>
+        <p class="why"><strong>Why:</strong> Creative/variant for A/Bs.</p>
+        <div class="do"><strong>Take action:</strong> Use short IDs tied to a creative library.</div>
+      </div>
+      <div class="tile">
+        <h3>utm_term</h3>
+        <div class="kv"><label>value</label><code id="utm_term">—</code></div>
+        <p class="why"><strong>Why:</strong> Keyword insights.</p>
+        <div class="do"><strong>Take action:</strong> Weekly negation/expansion by ROI.</div>
+      </div>
+      <div class="tile">
+        <h3>Campaign Group</h3>
+        <div class="kv"><label>value</label><code id="campaignGroup">—</code></div>
+        <p class="why"><strong>Why:</strong> Quick channel dashboards.</p>
+        <div class="do"><strong>Take action:</strong> Auto-derive from UTMs/click IDs on capture.</div>
+      </div>
+
+      <!-- Row 3: Click IDs full width -->
+      <div class="tile" style="grid-column:span 4">
+        <h3>Click IDs (Full-Width)</h3>
+        <div class="cid-grid">
+          <div class="kv"><label>gclid</label><code id="gclid">—</code></div>
+          <div class="kv"><label>fbclid</label><code id="fbclid">—</code></div>
+          <div class="kv"><label>msclkid</label><code id="msclkid">—</code></div>
+          <div class="kv"><label>ttclid</label><code id="ttclid">—</code></div>
+          <div class="kv"><label>li_fat_id</label><code id="li_fat_id">—</code></div>
+        </div>
+        <p class="why" style="margin-top:6px"><strong>Why:</strong> Join keys for offline conversions and lift studies.</p>
+        <div class="do"><strong>Take action:</strong> On Closed-Won, push attributed revenue back to each platform using its click ID to improve bidding.</div>
+      </div>
+    </div>
+  </section>
 
   <!-- Device & Environment -->
   <section class="section">
     <div class="section-title"><div><div class="kicker">Device & Environment</div><h2 class="h2">Context for QA and CRO</h2></div></div>
     <div class="tiles cols-4" style="margin-top:8px">
       <div class="tile"><h3>Device Type</h3><div class="kv"><label>value</label><code id="deviceType">—</code></div><p class="why"><strong>Why:</strong> Layout & CTA density.</p><div class="do"><strong>Take action:</strong> If Mobile, raise CTA frequency; reduce form fields.</div></div>
-      <div class="tile"><h3>OS</h3><div class="kv"><label>value</label><code id="os">—</code></div><p class="why"><strong>Why:</strong> QA focus.</p><div class="do"><strong>Take action:</strong> Keep a “top‑5 OS × browser” smoke test list.</div></div>
+      <div class="tile"><h3>OS</h3><div class="kv"><label>value</label><code id="os">—</code></div><p class="why"><strong>Why:</strong> QA focus.</p><div class="do"><strong>Take action:</strong> Keep a “top-5 OS × browser” smoke test list.</div></div>
       <div class="tile"><h3>Browser</h3><div class="kv"><label>value</label><code id="browser">—</code></div><p class="why"><strong>Why:</strong> Rendering quirks.</p><div class="do"><strong>Take action:</strong> Validate form and sticky CTAs on Safari specifically.</div></div>
-      <div class="tile"><h3>Screen</h3><div class="kv"><label>value</label><code id="screen">—</code></div><p class="why"><strong>Why:</strong> Above‑the‑fold decisions.</p><div class="do"><strong>Take action:</strong> Keep hero height ≤ 70% of common mobile viewports.</div></div>
-      <div class="tile" style="grid-column:span 4"><h3>User Agent</h3><div class="kv"><label>value</label><code id="ua">—</code></div><p class="why"><strong>Why:</strong> Debugging/self‑serve context for devs.</p><div class="do"><strong>Take action:</strong> Log UA to error reports for anonymous repros.</div></div>
+      <div class="tile"><h3>Screen</h3><div class="kv"><label>value</label><code id="screen">—</code></div><p class="why"><strong>Why:</strong> Above-the-fold decisions.</p><div class="do"><strong>Take action:</strong> Keep hero height ≤ 70% of common mobile viewports.</div></div>
+      <div class="tile" style="grid-column:span 4"><h3>User Agent</h3><div class="kv"><label>value</label><code id="ua">—</code></div><p class="why"><strong>Why:</strong> Debugging/self-serve context for devs.</p><div class="do"><strong>Take action:</strong> Log UA to error reports for anonymous repros.</div></div>
     </div>
   </section>
 
@@ -400,7 +405,7 @@
       <div class="tile"><h3>IP</h3><div class="kv"><label>value</label><code id="ip">—</code></div><p class="why"><strong>Why:</strong> Fraud & geo joins.</p><div class="do"><strong>Take action:</strong> Block notorious ranges and datacenter IPs.</div></div>
       <div class="tile"><h3>City</h3><div class="kv"><label>value</label><code id="city">—</code></div><p class="why"><strong>Why:</strong> Localization.</p><div class="do"><strong>Take action:</strong> Swap social proof by region.</div></div>
       <div class="tile"><h3>Region / State</h3><div class="kv"><label>value</label><code id="region">—</code></div><p class="why"><strong>Why:</strong> Territory routing.</p><div class="do"><strong>Take action:</strong> Assign AE by state fallback if form is empty.</div></div>
-      <div class="tile"><h3>Country</h3><div class="kv"><label>value</label><code id="country">—</code></div><p class="why"><strong>Why:</strong> Compliance & pricing.</p><div class="do"><strong>Take action:</strong> Hide non‑eligible SKUs automatically.</div></div>
+      <div class="tile"><h3>Country</h3><div class="kv"><label>value</label><code id="country">—</code></div><p class="why"><strong>Why:</strong> Compliance & pricing.</p><div class="do"><strong>Take action:</strong> Hide non-eligible SKUs automatically.</div></div>
       <div class="tile"><h3>Org / ASN</h3><div class="kv"><label>value</label><code id="org">—</code></div><p class="why"><strong>Why:</strong> Sometimes shows corporate networks.</p><div class="do"><strong>Take action:</strong> Treat as a hint only; confirm via enrichment or form domain.</div></div>
       <div class="tile" style="grid-column:span 4">
         <h3>Confidence</h3>
@@ -422,14 +427,14 @@
         <div class="tile"><h3>Employees</h3><div class="kv"><label>value</label><code id="enrich_employees">—</code></div><p class="why"><strong>Why:</strong> Tier & territory.</p><div class="do"><strong>Take action:</strong> Route 1k+ emp to enterprise team.</div></div>
         <div class="tile"><h3>Est. Revenue</h3><div class="kv"><label>value</label><code id="enrich_revenue">—</code></div><p class="why"><strong>Why:</strong> Deal sizing.</p><div class="do"><strong>Take action:</strong> Set min pipeline thresholds by band.</div></div>
         <div class="tile"><h3>Technologies</h3><div class="kv"><label>value</label><code id="enrich_tech">—</code></div><p class="why"><strong>Why:</strong> Integration story.</p><div class="do"><strong>Take action:</strong> Personalize CTA with stack fit (e.g., “Works with Salesforce”).</div></div>
-        <div class="tile"><h3>Intent Topics</h3><div class="kv"><label>value</label><code id="enrich_intent">—</code></div><p class="why"><strong>Why:</strong> Hot research themes.</p><div class="do"><strong>Take action:</strong> Launch air‑cover ads on those topics for matched accounts.</div></div>
+        <div class="tile"><h3>Intent Topics</h3><div class="kv"><label>value</label><code id="enrich_intent">—</code></div><p class="why"><strong>Why:</strong> Hot research themes.</p><div class="do"><strong>Take action:</strong> Launch air-cover ads on those topics for matched accounts.</div></div>
         <div class="tile"><h3>Confidence</h3><div class="kv"><label>value</label><code id="enrich_conf">—</code></div><p class="why"><strong>Why:</strong> Match quality signal.</p><div class="do"><strong>Take action:</strong> Gate sales alerts above 70% confidence.</div></div>
       </div>
       <div class="notice" style="margin-top:10px"><a id="enrichToggleBtn" class="btn secondary" href="#">Toggle demo on/off</a></div>
     </div>
   </section>
 
-  <!-- Engagement (tech detail kept last) -->
+  <!-- Engagement -->
   <section class="section">
     <div class="section-title"><div><div class="kicker">Engagement</div><h2 class="h2">What this visitor actually did</h2></div></div>
     <div class="tiles cols-4" style="margin-top:8px">
@@ -459,7 +464,7 @@
     <a class="btn secondary" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'})">Back to top</a>
   </section>
 
-  <div class="notice">This demo uses public signals only. For account‑level identification and intent, we integrate a paid enrichment provider; this page already shows the fields we map.</div>
+  <div class="notice">This demo uses public signals only. For account-level identification and intent, we integrate a paid enrichment provider; this page already shows the fields we map.</div>
 </main>
 
 <script>
@@ -473,10 +478,24 @@ const COMMON=["utm_source","utm_medium","utm_campaign","utm_content","utm_term",
 function parseQuery(){const out={};const q=location.search.replace(/^\?/,"");if(!q)return out;for(const p of q.split("&")){if(!p)continue;const[k,v=""]=p.split("=");out[decodeURIComponent(k||"").toLowerCase()]=decodeURIComponent(v||"")}return out;}
 function persistParams(){const p=parseQuery();const prev=JSON.parse(sessionStorage.getItem("params")||"{}");const next={...prev};for(const k of COMMON) if(p[k]) next[k]=p[k];next.landingUrl=location.href;sessionStorage.setItem("params",JSON.stringify(next));return next;}
 function referrer(){return document.referrer||"(direct / none)";}
-function group(params){const s=(params.utm_source||"").toLowerCase(),m=(params.utm_medium||"").toLowerCase();if(params.gclid)return"google-ads";if(params.li_fat_id)return"linkedin-ads";if(params.fbclid)return"meta-ads";if(params.msclkid)return"microsoft-ads";if(s.includes("linkedin"))return"linkedin";if(s.includes("google"))return"google-other";if(!s&&!document.referrer)return"direct";return`${s||"unknown"}-${m||"unknown"}`}
+function group(params){
+  const s=(params.utm_source||"").toLowerCase(), m=(params.utm_medium||"").toLowerCase();
+  if(params.gclid) return "google-ads";
+  if(params.li_fat_id) return "linkedin-ads";
+  if(params.fbclid) return "meta-ads";
+  if(params.msclkid) return "microsoft-ads";
+  if(s.includes("linkedin")) return "linkedin";
+  if(s.includes("google")) return "google-other";
+  if(!s && !document.referrer) return "direct";
+  return `${s||"unknown"}-${m||"unknown"}`;
+}
 
 /* ===== device ===== */
-function device(){const ua=navigator.userAgent||"";const mobile=/Mobi|Android/i.test(ua);const os=/Windows NT/i.test(ua)?"Windows":/Mac OS X/i.test(ua)?"macOS":/Android/i.test(ua)?"Android":/iPhone|iPad|iPod/i.test(ua)?"iOS":/Linux/i.test(ua)?"Linux":"Other";const browser=/Chrome/i.test(ua)&&!/Edg/i.test(ua)?"Chrome":/Edg/i.test(ua)?"Edge":/Firefox/i.test(ua)?"Firefox":/Safari/i.test(ua)&&!/Chrome/i.test(ua)?"Safari":/Opera|OPR/i.test(ua)?"Opera":"Other";return{type:mobile?"Mobile":"Desktop",os,browser,screen:`${screen.width}×${screen.height}`,ua}}
+function device(){const ua=navigator.userAgent||"";const mobile=/Mobi|Android/i.test(ua);
+  const os=/Windows NT/i.test(ua)?"Windows":/Mac OS X/i.test(ua)?"macOS":/Android/i.test(ua)?"Android":/iPhone|iPad|iPod/i.test(ua)?"iOS":/Linux/i.test(ua)?"Linux":"Other";
+  const browser=/Chrome/i.test(ua)&&!/Edg/i.test(ua)?"Chrome":/Edg/i.test(ua)?"Edge":/Firefox/i.test(ua)?"Firefox":/Safari/i.test(ua)&&!/Chrome/i.test(ua)?"Safari":/Opera|OPR/i.test(ua)?"Opera":"Other";
+  return{type:mobile?"Mobile":"Desktop",os,browser,screen:`${screen.width}×${screen.height}`,ua}
+}
 /* ===== geo ===== */
 function withTimeout(p,ms=3500){let t;return Promise.race([p,new Promise((_,r)=>t=setTimeout(()=>r(new Error("timeout")),ms))]).finally(()=>clearTimeout(t))}
 async function ipapi(){const r=await withTimeout(fetch("https://ipapi.co/json/"),3500);if(!r.ok)throw 0;const j=await r.json();return{ip:j.ip||null,city:j.city||null,region:j.region||null,country:j.country_name||j.country||null,org:j.org||j.asn||null}}
@@ -503,11 +522,22 @@ function updateEngageChart(){if(!engageLine)return;const last=sess.timeline[sess
 
 /* ===== rendering ===== */
 function renderAcq(p){
-  SAFE.set("referrer",referrer()); SAFE.set("landingUrl",p.landingUrl||location.href);
-  ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id"].forEach(k=>SAFE.set(k,p[k]||"—"));
-  const g=group(p); SAFE.set("campaignGroup",g); SAFE.set("campaignGroupTop",g);
+  SAFE.set("referrer", referrer());
+  SAFE.set("landingUrl", p.landingUrl || location.href);
+
+  ["utm_source","utm_medium","utm_campaign","utm_content","utm_term",
+   "gclid","fbclid","msclkid","ttclid","li_fat_id"]
+  .forEach(k => SAFE.set(k, p[k] || "—"));
+
+  // Derive campaign group and set both tiles
+  const g = group(p);
+  SAFE.set("campaignGroup", g);
+  SAFE.set("campaignGroupTop", g);
 }
-function renderDev(d){["deviceType","os","browser","screen","ua"].forEach(k=>SAFE.set(k,d[k])); SAFE.set("ua_cap",d.ua);}
+function renderDev(d){
+  ["deviceType","os","browser","screen","ua"].forEach(k=>SAFE.set(k,d[k]));
+  SAFE.set("ua_cap",d.ua);
+}
 function renderGeo(g){
   SAFE.set("ip",g.ip); SAFE.set("city",g.city); SAFE.set("region",g.region); SAFE.set("country",g.country); SAFE.set("org",g.org);
   SAFE.set("sfIP",g.ip||"—"); SAFE.set("sfCity",g.city||"—"); SAFE.set("sfRegion",g.region||"—"); SAFE.set("sfCountry",g.country||"—"); SAFE.set("sfOrg",g.org||"—");
@@ -554,9 +584,12 @@ function enrichToSF(e){if(!e)return;SAFE.set("sfLeadCompany",e.company);SAFE.set
 SAFE.on("enrichToggleBtn","click",(ev)=>{ev.preventDefault();const url=new URL(location.href);url.searchParams.set("demo_enrich",url.searchParams.get("demo_enrich")==="1"?"0":"1");location.href=url.toString();});
 
 /* ===== INIT ===== */
-(async function(){
-  const p=persistParams();
-  const d=device(); renderAcq(p); renderDev(d);
+(async function init(){
+  const p = persistParams();   // persist & read UTMs first
+  renderAcq(p);                // render acquisition + campaign group
+
+  const d = device();          // then device
+  renderDev(d);
 
   let g={}; try{g=await geo(); renderGeo(g)}catch(e){}
   if(window.Chart) initCharts();
@@ -573,10 +606,7 @@ SAFE.on("enrichToggleBtn","click",(ev)=>{ev.preventDefault();const url=new URL(l
   SAFE.set("sfClickIds",clickIds);
   SAFE.set("sfDevice",`${d.type} • ${d.os} • ${d.browser} • ${d.screen}`);
   SAFE.set("sfCreated",new Date().toLocaleString());
-const g = group(p);
-  SAFE.set("campaignGroup", g);
-  SAFE.set("campaignGroupTop", g); // ensures Outcomes card shows same Campaign Group
-  
+
   // Enrichment (optional)
   if(isDemo(p)){const e=simulate(p,g); renderEnrich(e); enrichToSF(e);}
 
