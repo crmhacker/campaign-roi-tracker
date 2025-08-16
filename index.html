@@ -4,32 +4,19 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>CRM Hacker — Live Campaign ROI Demo</title>
-<meta name="description" content="See UTMs, device, geo, engagement in real time — and how CRM Hacker maps it to Salesforce to prove campaign ROI." />
+<meta name="description" content="See your own click’s data, projected ROI, and Salesforce preview — then dig into the exact signals we capture and how to use them." />
 <meta name="theme-color" content="#e41414" />
 
 <style>
-  /* ================= CRM Hacker — Salesforce Consulting look ================= */
+  /* ===== CRM Hacker black/white/red look ===== */
   :root{
-    --bg:#ffffff;
-    --ink:#0b0b0b;         /* near black */
-    --muted:#4b5563;       /* slate-ish */
-    --line:#e5e7eb;        /* light border */
-    --card:#ffffff;
-    --brand:#e41414;       /* CRMH red accent */
-    --brand-ink:#000000;
-    --brand-soft:#ffe5e5;  /* soft red tint for chips */
-    --radius:14px;
-    --shadow:0 8px 24px rgba(0,0,0,.06);
+    --bg:#ffffff; --ink:#0b0b0b; --muted:#4b5563; --line:#e5e7eb; --card:#ffffff;
+    --brand:#e41414; --brand-ink:#000; --brand-soft:#ffe5e5;
+    --radius:14px; --shadow:0 8px 24px rgba(0,0,0,.06);
   }
   *{box-sizing:border-box}
   html,body{height:100%;overflow-x:hidden}
-  body{
-    margin:0;
-    font-family: Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif;
-    color:var(--ink);
-    background:var(--bg);
-    -webkit-font-smoothing:antialiased;
-  }
+  body{margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
   img{max-width:100%;height:auto;display:block}
   .container{max-width:1200px;margin:0 auto;padding:clamp(12px,2vw,24px)}
   .kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
@@ -41,16 +28,18 @@
   .notice{background:#fafafa;border:1px solid var(--line);border-radius:12px;padding:10px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px}
 
-  /* ====== Header (black/white + red) ====== */
-  .hero{border-bottom:1px solid var(--line);background:
-    linear-gradient(180deg,#ffffff 0,#ffffff 50%,#fff 100%)}
+  /* Header + sticky CTA bar */
+  .hero{border-bottom:1px solid var(--line);background:#fff}
   .hero-inner{display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding:18px 0}
   .brand{display:flex;align-items:center;gap:12px}
   .logoBox{width:58px;height:58px;border-radius:12px;overflow:hidden;background:#000;display:grid;place-items:center;border:2px solid #000}
   .brandText{font-weight:900;font-size:18px;letter-spacing:.02em}
   .tag{font-size:12px;color:var(--muted)}
+  .topbar{position:sticky;top:0;z-index:50;background:#111;color:#fff;border-bottom:1px solid #000}
+  .topbar-inner{max-width:1200px;margin:0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:8px 12px}
+  .topbar .cta{background:var(--brand);color:#fff;border-radius:10px;padding:8px 12px;font-weight:900;text-decoration:none}
 
-  /* ====== Sections / tiles ====== */
+  /* Sections / tiles */
   .section{margin:22px 0}
   .section-title{display:flex;align-items:flex-end;justify-content:space-between;margin:0 0 8px}
   .lead{color:var(--muted);margin-top:4px}
@@ -62,15 +51,11 @@
   .tile h3{font-size:13px;margin:0 0 6px;font-weight:800;letter-spacing:.02em;text-transform:uppercase}
   .kv{display:block;border:1px dashed var(--line);padding:6px 8px;border-radius:10px;background:#fff}
   .kv label{display:inline-block;color:var(--muted);font-size:11px;margin-bottom:6px}
-  /* Always show full values, wrap aggressively */
-  .kv code{
-    display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-    background:#fcfcfc;border:1px solid var(--line);padding:6px 8px;border-radius:8px;
-    white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;
-  }
+  .kv code{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#fcfcfc;border:1px solid var(--line);padding:6px 8px;border-radius:8px;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
   .why{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.55}
+  .do{font-size:11px;color:#111;margin-top:6px;background:var(--brand-soft);border:1px solid #fbd4d4;padding:8px;border-radius:10px}
 
-  /* Charts (compact like GA) */
+  /* Charts */
   .chart-grid{display:grid;gap:10px}
   @media(min-width:980px){.chart-grid.cols-3{grid-template-columns:2fr 1fr 1fr}}
   .card canvas{width:100% !important;height:220px !important}
@@ -82,7 +67,7 @@
   .step:after{content:"→";position:absolute;right:-10px;top:50%;transform:translateY(-50%);color:#9ca3af}
   .step:last-child:after{display:none}
 
-  /* Salesforce-ish, styled to match your brand */
+  /* Salesforce-ish */
   .sf-tabs{display:flex;gap:8px}
   .sf-tab{background:#fff;border:1px solid var(--line);padding:8px 12px;border-radius:10px;cursor:pointer}
   .sf-tab.active{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-soft)}
@@ -104,10 +89,6 @@
   .sf-field{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}
   .sf-field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
 
-  /* CTA */
-  .cta{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}
-  .cta .h2{text-transform:uppercase;letter-spacing:.02em}
-
   /* Utilities */
   table{width:100%;border-collapse:collapse}
   th,td{padding:6px;border-bottom:1px solid var(--line);text-align:left;word-break:break-word;overflow-wrap:anywhere}
@@ -120,6 +101,17 @@
 </head>
 
 <body>
+<!-- Sticky top CTA -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div style="display:flex;align-items:center;gap:10px">
+      <strong>Ready to prove ROI?</strong>
+      <span class="sub" style="color:#d1d5db">See your own data below — then get a plan.</span>
+    </div>
+    <a class="cta" href="https://calendly.com/crmhacker_jonathan" target="_blank" rel="noopener">Schedule Your Free ROI Blueprint</a>
+  </div>
+</div>
+
 <header class="hero">
   <div class="container hero-inner">
     <div class="brand">
@@ -130,116 +122,56 @@
       </div>
     </div>
     <div>
-      <div class="kicker">Prove Campaign ROI</div>
-      <h1 class="h1">From click → closed, live and in color.</h1>
-      <p class="sub">Minimal noise. High signal. Your own click’s data mapped to Salesforce the way we deploy for clients.</p>
+      <div class="kicker">Outcome‑first</div>
+      <h1 class="h1">Your results up top. The how below.</h1>
+      <p class="sub">Instant dashboards + Salesforce preview from your click. Then we unpack every signal and how to act on it.</p>
     </div>
   </div>
 </header>
 
 <main class="container">
-  <div class="notice">Free-only signals: UTMs/click IDs, referrer, device, IP geo, and on-page engagement. Add <code>?demo_enrich=1</code> to simulate firmographic/intent enrichment.</div>
+  <div class="notice">Free‑only signals: UTMs/click IDs, referrer, device, IP geo, and on‑page engagement. Add <code>?demo_enrich=1</code> to simulate firmographic/intent enrichment (no paid API).</div>
 
-  <!-- Acquisition -->
+  <!-- ================== OUTCOMES FIRST ================== -->
+
+  <!-- Headline Outcomes -->
   <section class="section">
     <div class="section-title">
-      <div>
-        <div class="kicker">Acquisition & Attribution</div>
-        <h2 class="h2">Where did this click come from?</h2>
-        <p class="lead">Compact tiles; long values wrap fully. Perfect for Salesforce field stamping and platform de-dupe.</p>
-      </div>
+      <div><div class="kicker">Outcomes</div><h2 class="h2">What you get from this click</h2></div>
     </div>
-
     <div class="tiles cols-4" style="margin-top:8px">
-      <div class="tile"><h3>Referrer</h3><div class="kv"><label>value</label><code id="referrer">—</code></div><p class="why"><strong>Why:</strong> Separate paid/organic/partner/direct. <strong>Do:</strong> Source audits & “direct” cleanup.</p></div>
-      <div class="tile"><h3>Landing URL</h3><div class="kv"><label>value</label><code id="landingUrl">—</code></div><p class="why"><strong>Why:</strong> Persist UTMs across steps. <strong>Do:</strong> Store for BI/audit.</p></div>
-      <div class="tile"><h3>utm_source</h3><div class="kv"><label>value</label><code id="utm_source">—</code></div><p class="why"><strong>Why:</strong> Channel bucket. <strong>Do:</strong> Normalize taxonomy.</p></div>
-      <div class="tile"><h3>utm_medium</h3><div class="kv"><label>value</label><code id="utm_medium">—</code></div><p class="why"><strong>Why:</strong> cpc/social/email. <strong>Do:</strong> Consistent ROI by medium.</p></div>
-      <div class="tile"><h3>utm_campaign</h3><div class="kv"><label>value</label><code id="utm_campaign">—</code></div><p class="why"><strong>Why:</strong> Budget/goal unit. <strong>Do:</strong> Shift spend by performance.</p></div>
-      <div class="tile"><h3>utm_content</h3><div class="kv"><label>value</label><code id="utm_content">—</code></div><p class="why"><strong>Why:</strong> Creative ID. <strong>Do:</strong> Scale winners, pause losers.</p></div>
-      <div class="tile"><h3>utm_term</h3><div class="kv"><label>value</label><code id="utm_term">—</code></div><p class="why"><strong>Why:</strong> Keyword. <strong>Do:</strong> Add/negate based on ROI.</p></div>
       <div class="tile">
-        <h3>Click IDs</h3>
-        <div class="kv"><label>gclid</label><code id="gclid">—</code></div>
-        <div class="kv" style="margin-top:6px"><label>fbclid</label><code id="fbclid">—</code></div>
-        <div class="kv" style="margin-top:6px"><label>msclkid</label><code id="msclkid">—</code></div>
-        <div class="kv" style="margin-top:6px"><label>ttclid</label><code id="ttclid">—</code></div>
-        <div class="kv" style="margin-top:6px"><label>li_fat_id</label><code id="li_fat_id">—</code></div>
-        <p class="why"><strong>Why:</strong> Offline conversions. <strong>Do:</strong> Push revenue back to ad platforms.</p>
+        <h3>Projected ROI</h3>
+        <div class="kv"><label>estimate</label><code id="projSummary">—</code></div>
+        <p class="why"><strong>Why:</strong> Tie spend to revenue with an agreed model.</p>
+        <div class="do"><strong>Take action:</strong> Pick one attribution model (LT/FT/Linear/W) and socialize it with Sales & Finance so everyone reports the same number.</div>
       </div>
-      <div class="tile"><h3>Campaign Group</h3><div class="kv"><label>value</label><code id="campaignGroup">—</code></div><p class="why"><strong>Why:</strong> Fast channel dashboards. <strong>Do:</strong> Auto-bucket unknowns.</p></div>
-    </div>
-  </section>
-
-  <!-- Device -->
-  <section class="section">
-    <div class="section-title">
-      <div><div class="kicker">Device & Environment</div><h2 class="h2">How they’re experiencing your page</h2></div>
-    </div>
-    <div class="tiles cols-4" style="margin-top:8px">
-      <div class="tile"><h3>Device Type</h3><div class="kv"><label>value</label><code id="deviceType">—</code></div><p class="why"><strong>Why:</strong> Layout & CTAs. <strong>Do:</strong> Mobile-first CRO.</p></div>
-      <div class="tile"><h3>OS</h3><div class="kv"><label>value</label><code id="os">—</code></div><p class="why"><strong>Why:</strong> QA/specs. <strong>Do:</strong> Patch OS issues.</p></div>
-      <div class="tile"><h3>Browser</h3><div class="kv"><label>value</label><code id="browser">—</code></div><p class="why"><strong>Why:</strong> Rendering quirks. <strong>Do:</strong> Safari fixes, etc.</p></div>
-      <div class="tile"><h3>Screen</h3><div class="kv"><label>value</label><code id="screen">—</code></div><p class="why"><strong>Why:</strong> Fold placement. <strong>Do:</strong> Hero size & CTA location.</p></div>
-      <div class="tile" style="grid-column:span 4"><h3>User Agent</h3><div class="kv"><label>value</label><code id="ua">—</code></div><p class="why"><strong>Why:</strong> Debugging. <strong>Do:</strong> Triage support issues.</p></div>
-    </div>
-  </section>
-
-  <!-- Geo -->
-  <section class="section">
-    <div class="section-title">
-      <div><div class="kicker">Geo & Org</div><h2 class="h2">Where is this click coming from?</h2></div>
-    </div>
-    <div class="tiles cols-4" style="margin-top:8px">
-      <div class="tile"><h3>IP</h3><div class="kv"><label>value</label><code id="ip">—</code></div><p class="why"><strong>Why:</strong> Fraud/geo joins. <strong>Do:</strong> Block bad ranges.</p></div>
-      <div class="tile"><h3>City</h3><div class="kv"><label>value</label><code id="city">—</code></div><p class="why"><strong>Why:</strong> Localization. <strong>Do:</strong> Region copy.</p></div>
-      <div class="tile"><h3>Region / State</h3><div class="kv"><label>value</label><code id="region">—</code></div><p class="why"><strong>Why:</strong> Territory routing. <strong>Do:</strong> Assign AE.</p></div>
-      <div class="tile"><h3>Country</h3><div class="kv"><label>value</label><code id="country">—</code></div><p class="why"><strong>Why:</strong> Pricing & compliance. <strong>Do:</strong> Localize.</p></div>
-      <div class="tile"><h3>Org / ASN</h3><div class="kv"><label>value</label><code id="org">—</code></div><p class="why"><strong>Why:</strong> Corporate hint (often ISP). <strong>Do:</strong> ABM clue only.</p></div>
-      <div class="tile" style="grid-column:span 4">
-        <h3>Confidence</h3>
-        <div class="kv"><label>note</label><code>Org ≈ ISP unless the visitor is on a corporate network.</code></div>
-        <p class="why"><strong>Why:</strong> Free IP data is imperfect. <strong>Do:</strong> Use paid enrichment for firmographics/intent.</p>
+      <div class="tile">
+        <h3>Primary Channel</h3>
+        <div class="kv"><label>group</label><code id="campaignGroupTop">—</code></div>
+        <p class="why"><strong>Why:</strong> Fast spend reallocation by channel.</p>
+        <div class="do"><strong>Take action:</strong> If this channel performs above median ROI this week, shift 10–20% budget from the bottom channel.</div>
+      </div>
+      <div class="tile">
+        <h3>Lead Snapshot</h3>
+        <div class="kv"><label>Salesforce</label><code id="leadSnap">—</code></div>
+        <p class="why"><strong>Why:</strong> Marketing proof inside the CRM reps live in.</p>
+        <div class="do"><strong>Take action:</strong> Stamp UTMs on Lead creation; never lose the source of truth during handoff.</div>
+      </div>
+      <div class="tile">
+        <h3>Engagement</h3>
+        <div class="kv"><label>this visit</label><code id="engageSnap">—</code></div>
+        <p class="why"><strong>Why:</strong> Qualification signal without cookies.</p>
+        <div class="do"><strong>Take action:</strong> Trigger SDR alerts when <em>Time on page ≥ 60s</em> AND <em>Scroll depth ≥ 60%</em>.</div>
       </div>
     </div>
   </section>
 
-  <!-- Enrichment demo -->
+  <!-- Quick Dashboards -->
   <section class="section">
-    <div class="section-title">
-      <div><div class="kicker">Enterprise Enrichment (demo)</div><h2 class="h2">Turn anonymous visits into account insights</h2></div>
-    </div>
-    <div class="card">
-      <p class="sub" style="margin-top:0">Add <code>?demo_enrich=1</code> to the URL to simulate firmographics & intent (no paid API).</p>
-      <div class="tiles cols-4" style="margin-top:8px">
-        <div class="tile"><h3>Company</h3><div class="kv"><label>value</label><code id="enrich_company">—</code></div><p class="why"><strong>Why:</strong> Account match. <strong>Do:</strong> Route owner.</p></div>
-        <div class="tile"><h3>Domain</h3><div class="kv"><label>value</label><code id="enrich_domain">—</code></div><p class="why"><strong>Why:</strong> Dedupe. <strong>Do:</strong> Web-to-Lead stamping.</p></div>
-        <div class="tile"><h3>Industry</h3><div class="kv"><label>value</label><code id="enrich_industry">—</code></div><p class="why"><strong>Why:</strong> ICP fit. <strong>Do:</strong> Vertical messaging.</p></div>
-        <div class="tile"><h3>Employees</h3><div class="kv"><label>value</label><code id="enrich_employees">—</code></div><p class="why"><strong>Why:</strong> Tiering. <strong>Do:</strong> Territories.</p></div>
-        <div class="tile"><h3>Est. Revenue</h3><div class="kv"><label>value</label><code id="enrich_revenue">—</code></div><p class="why"><strong>Why:</strong> TAM. <strong>Do:</strong> Deal size.</p></div>
-        <div class="tile"><h3>Technologies</h3><div class="kv"><label>value</label><code id="enrich_tech">—</code></div><p class="why"><strong>Why:</strong> Stack fit. <strong>Do:</strong> Integrations.</p></div>
-        <div class="tile"><h3>Intent Topics</h3><div class="kv"><label>value</label><code id="enrich_intent">—</code></div><p class="why"><strong>Why:</strong> Hot topics. <strong>Do:</strong> Trigger plays.</p></div>
-        <div class="tile"><h3>Confidence</h3><div class="kv"><label>value</label><code id="enrich_conf">—</code></div><p class="why"><strong>Why:</strong> Match quality. <strong>Do:</strong> Gate alerts/routing.</p></div>
-      </div>
-      <div class="notice" style="margin-top:10px"><a id="enrichToggleBtn" class="btn secondary" href="#">Toggle demo on/off</a></div>
-    </div>
-  </section>
-
-  <!-- Engagement -->
-  <section class="section">
-    <div class="section-title"><div><div class="kicker">Engagement</div><h2 class="h2">Are they actually engaging?</h2></div></div>
-    <div class="tiles cols-4" style="margin-top:8px">
-      <div class="tile"><h3>Time on Page</h3><div class="kv"><label>value</label><code id="timeOnPage">0s</code></div><p class="why"><strong>Why:</strong> Intent proxy. <strong>Do:</strong> MQL scoring, nudges.</p></div>
-      <div class="tile"><h3>Scroll Depth</h3><div class="kv"><label>value</label><code id="scrollDepth">0%</code></div><p class="why"><strong>Why:</strong> Content resonance. <strong>Do:</strong> Promote winners.</p></div>
-      <div class="tile"><h3>Pageviews</h3><div class="kv"><label>value</label><code id="pageviews">1</code></div><p class="why"><strong>Why:</strong> Research behavior. <strong>Do:</strong> SDR alerts.</p></div>
-    </div>
-  </section>
-
-  <!-- Dashboards -->
-  <section class="section">
-    <div class="section-title"><div><div class="kicker">Dashboards</div><h2 class="h2">Quick visuals (GA-style)</h2></div></div>
+    <div class="section-title"><div><div class="kicker">Dashboards</div><h2 class="h2">At‑a‑glance performance</h2></div></div>
     <div class="chart-grid cols-3">
-      <div class="card"><div class="kicker">Source Grouping</div><canvas id="sourceDonut"></canvas><p class="sub">Buckets by UTMs/click IDs.</p></div>
+      <div class="card"><div class="kicker">Source Grouping</div><canvas id="sourceDonut"></canvas><p class="sub">Buckets from your UTMs/click IDs.</p></div>
       <div class="card"><div class="kicker">Device & OS</div><canvas id="deviceBar"></canvas><p class="sub">Your environment vs. example mix.</p></div>
       <div class="card"><div class="kicker">Engagement (this visit)</div><canvas id="engageLine"></canvas><p class="sub">Seconds on page & scroll.</p></div>
     </div>
@@ -247,7 +179,7 @@
 
   <!-- Salesforce Preview -->
   <section class="section">
-    <div class="section-title"><div><div class="kicker">Salesforce Preview</div><h2 class="h2">What this looks like inside Salesforce</h2></div></div>
+    <div class="section-title"><div><div class="kicker">Salesforce Preview</div><h2 class="h2">Exactly how this looks in Salesforce</h2></div></div>
 
     <div class="sf-tabs card" style="margin-bottom:8px">
       <button class="sf-tab active" data-tab="leadTab">Lead</button>
@@ -277,7 +209,6 @@
             <div class="sf-field"><label>Lead Source Detail</label><div id="sfLeadSourceDetail">—</div></div>
             <div class="sf-field"><label>Click IDs</label><div id="sfClickIds">—</div></div>
             <div class="sf-field"><label>Device</label><div id="sfDevice">—</div></div>
-            <!-- Split GEO -->
             <div class="sf-field"><label>IP Address</label><div id="sfIP">—</div></div>
             <div class="sf-field"><label>City</label><div id="sfCity">—</div></div>
             <div class="sf-field"><label>Region / State</label><div id="sfRegion">—</div></div>
@@ -346,17 +277,115 @@
             <div class="tile"><h3>Revenue by Model</h3><canvas id="modelBar"></canvas></div>
             <div class="tile"><h3>Touches per Opp</h3><canvas id="touchDist"></canvas></div>
           </div>
-          <div class="notice" style="margin-top:10px">
-            <strong>ROI:</strong> <code>(Attributed Revenue − Spend) ÷ Spend</code>. Spend = media + fees (+ optional SDR/AE). Revenue = Closed-Won × attribution share.
-          </div>
+          <div class="notice" style="margin-top:10px"><strong>ROI:</strong> <code>(Attributed Revenue − Spend) ÷ Spend</code>. Agree the model up front.</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Journey + CTA -->
+  <!-- Quick “Do This Today” -->
   <section class="section">
-    <div class="section-title"><div><div class="kicker">From Click to Revenue</div><h2 class="h2">How this connects to ROI</h2></div></div>
+    <div class="section-title"><div><div class="kicker">Do this today</div><h2 class="h2">5 free moves that raise ROI clarity</h2></div></div>
+    <div class="tiles cols-4" style="margin-top:8px">
+      <div class="tile"><h3>Normalize UTMs</h3><div class="why"><strong>Why:</strong> Dirty taxonomy = broken reports.</div><div class="do"><strong>Take action:</strong> Standardize <code>utm_source</code>/<code>utm_medium</code> list; reject anything else at form submit.</div></div>
+      <div class="tile"><h3>Stamp on Lead</h3><div class="why"><strong>Why:</strong> Attribution survives handoffs.</div><div class="do"><strong>Take action:</strong> Hidden fields for UTMs + referrer + landing URL; write to Lead & Campaign Member.</div></div>
+      <div class="tile"><h3>Click‑ID Capture</h3><div class="why"><strong>Why:</strong> Offline conversions back to platforms.</div><div class="do"><strong>Take action:</strong> Store <code>gclid</code>/<code>li_fat_id</code>/etc. and send on closed‑won.</div></div>
+      <div class="tile"><h3>Engagement Score</h3><div class="why"><strong>Why:</strong> No cookies needed.</div><div class="do"><strong>Take action:</strong> Score ≥60s time + ≥60% scroll as “Hot” → SDR alert.</div></div>
+      <div class="tile"><h3>Single Truth</h3><div class="why"><strong>Why:</strong> Stop dashboard arguments.</div><div class="do"><strong>Take action:</strong> Choose one model (LT/FT/Linear/W) and lock it for Q.</div></div>
+      <div class="tile"><h3>Govern Redirects</h3><div class="why"><strong>Why:</strong> UTMs often drop.</div><div class="do"><strong>Take action:</strong> Preserve query strings through any vanity/redirect links.</div></div>
+      <div class="tile"><h3>Geo Routing</h3><div class="why"><strong>Why:</strong> Faster follow‑up.</div><div class="do"><strong>Take action:</strong> Use free IP city/region for territory routing when form is blank.</div></div>
+      <div class="tile"><h3>ABM Match (Optional)</h3><div class="why"><strong>Why:</strong> Better account focus.</div><div class="do"><strong>Take action:</strong> Try <code>?demo_enrich=1</code> to see firmographics fields you’ll map when you add enrichment.</div></div>
+    </div>
+  </section>
+
+  <!-- ================== DETAILS AFTER OUTCOMES ================== -->
+
+  <!-- Acquisition & Attribution (expanded guidance) -->
+  <section class="section">
+    <div class="section-title"><div><div class="kicker">Acquisition & Attribution</div><h2 class="h2">The signals that power ROI</h2></div></div>
+    <div class="tiles cols-4" style="margin-top:8px">
+      <div class="tile"><h3>Referrer</h3><div class="kv"><label>value</label><code id="referrer">—</code></div><p class="why"><strong>Why:</strong> Distinguishes paid/organic/partner/direct; fixes “Direct” buckets.</p><div class="do"><strong>Take action:</strong> Investigate any spike in Direct with unchanged spend—usually UTMs dropped.</div></div>
+      <div class="tile"><h3>Landing URL</h3><div class="kv"><label>value</label><code id="landingUrl">—</code></div><p class="why"><strong>Why:</strong> Keeps UTMs intact across steps/sessions.</p><div class="do"><strong>Take action:</strong> Persist UTMs to local storage/session and re‑append on form pages.</div></div>
+      <div class="tile"><h3>utm_source</h3><div class="kv"><label>value</label><code id="utm_source">—</code></div><p class="why"><strong>Why:</strong> Primary channel grouping.</p><div class="do"><strong>Take action:</strong> Enforce lowercase, whitelist allowed values.</div></div>
+      <div class="tile"><h3>utm_medium</h3><div class="kv"><label>value</label><code id="utm_medium">—</code></div><p class="why"><strong>Why:</strong> Traffic type (cpc/social/email).</p><div class="do"><strong>Take action:</strong> Map platform terms (e.g., <em>paid_social</em>) into your standard set.</div></div>
+      <div class="tile"><h3>utm_campaign</h3><div class="kv"><label>value</label><code id="utm_campaign">—</code></div><p class="why"><strong>Why:</strong> Budget/goal unit.</p><div class="do"><strong>Take action:</strong> Prefix campaigns with channel & quarter for reporting (e.g., <code>li_q3_roi_demo</code>).</div></div>
+      <div class="tile"><h3>utm_content</h3><div class="kv"><label>value</label><code id="utm_content">—</code></div><p class="why"><strong>Why:</strong> Creative/variant for A/Bs.</p><div class="do"><strong>Take action:</strong> Use short IDs that map to a creative library.</div></div>
+      <div class="tile"><h3>utm_term</h3><div class="kv"><label>value</label><code id="utm_term">—</code></div><p class="why"><strong>Why:</strong> Keyword insights.</p><div class="do"><strong>Take action:</strong> Weekly negative/expansion pass using ROI not just CPC.</div></div>
+      <div class="tile">
+        <h3>Click IDs</h3>
+        <div class="kv"><label>gclid</label><code id="gclid">—</code></div>
+        <div class="kv" style="margin-top:6px"><label>fbclid</label><code id="fbclid">—</code></div>
+        <div class="kv" style="margin-top:6px"><label>msclkid</label><code id="msclkid">—</code></div>
+        <div class="kv" style="margin-top:6px"><label>ttclid</label><code id="ttclid">—</code></div>
+        <div class="kv" style="margin-top:6px"><label>li_fat_id</label><code id="li_fat_id">—</code></div>
+        <p class="why"><strong>Why:</strong> Join keys for offline conversions.</p>
+        <div class="do"><strong>Take action:</strong> On Closed‑Won, push attributed revenue back to each platform using its click ID.</div>
+      </div>
+      <div class="tile"><h3>Campaign Group</h3><div class="kv"><label>value</label><code id="campaignGroup">—</code></div><p class="why"><strong>Why:</strong> Quick channel dashboards.</p><div class="do"><strong>Take action:</strong> Auto‑derive group from UTMs/click IDs on capture.</div></div>
+    </div>
+  </section>
+
+  <!-- Device & Environment -->
+  <section class="section">
+    <div class="section-title"><div><div class="kicker">Device & Environment</div><h2 class="h2">Context for QA and CRO</h2></div></div>
+    <div class="tiles cols-4" style="margin-top:8px">
+      <div class="tile"><h3>Device Type</h3><div class="kv"><label>value</label><code id="deviceType">—</code></div><p class="why"><strong>Why:</strong> Layout & CTA density.</p><div class="do"><strong>Take action:</strong> If Mobile, raise CTA frequency; reduce form fields.</div></div>
+      <div class="tile"><h3>OS</h3><div class="kv"><label>value</label><code id="os">—</code></div><p class="why"><strong>Why:</strong> QA focus.</p><div class="do"><strong>Take action:</strong> Keep a “top‑5 OS × browser” smoke test list.</div></div>
+      <div class="tile"><h3>Browser</h3><div class="kv"><label>value</label><code id="browser">—</code></div><p class="why"><strong>Why:</strong> Rendering quirks.</p><div class="do"><strong>Take action:</strong> Validate form and sticky CTAs on Safari specifically.</div></div>
+      <div class="tile"><h3>Screen</h3><div class="kv"><label>value</label><code id="screen">—</code></div><p class="why"><strong>Why:</strong> Above‑the‑fold decisions.</p><div class="do"><strong>Take action:</strong> Keep hero height ≤ 70% of common mobile viewports.</div></div>
+      <div class="tile" style="grid-column:span 4"><h3>User Agent</h3><div class="kv"><label>value</label><code id="ua">—</code></div><p class="why"><strong>Why:</strong> Debugging/self‑serve context for devs.</p><div class="do"><strong>Take action:</strong> Log UA to error reports for anonymous repros.</div></div>
+    </div>
+  </section>
+
+  <!-- Geo & Org -->
+  <section class="section">
+    <div class="section-title"><div><div class="kicker">Geo & Org</div><h2 class="h2">Where this click came from</h2></div></div>
+    <div class="tiles cols-4" style="margin-top:8px">
+      <div class="tile"><h3>IP</h3><div class="kv"><label>value</label><code id="ip">—</code></div><p class="why"><strong>Why:</strong> Fraud & geo joins.</p><div class="do"><strong>Take action:</strong> Block notorious ranges and datacenter IPs.</div></div>
+      <div class="tile"><h3>City</h3><div class="kv"><label>value</label><code id="city">—</code></div><p class="why"><strong>Why:</strong> Localization.</p><div class="do"><strong>Take action:</strong> Swap social proof by region.</div></div>
+      <div class="tile"><h3>Region / State</h3><div class="kv"><label>value</label><code id="region">—</code></div><p class="why"><strong>Why:</strong> Territory routing.</p><div class="do"><strong>Take action:</strong> Assign AE by state fallback if form is empty.</div></div>
+      <div class="tile"><h3>Country</h3><div class="kv"><label>value</label><code id="country">—</code></div><p class="why"><strong>Why:</strong> Compliance & pricing.</p><div class="do"><strong>Take action:</strong> Hide non‑eligible SKUs automatically.</div></div>
+      <div class="tile"><h3>Org / ASN</h3><div class="kv"><label>value</label><code id="org">—</code></div><p class="why"><strong>Why:</strong> Sometimes shows corporate networks.</p><div class="do"><strong>Take action:</strong> Treat as a hint only; confirm via enrichment or form domain.</div></div>
+      <div class="tile" style="grid-column:span 4">
+        <h3>Confidence</h3>
+        <div class="kv"><label>note</label><code>Org ≈ ISP unless the visitor is on a corporate network.</code></div>
+        <div class="do"><strong>Take action:</strong> Add a paid enrichment provider when you’re ready; fields are already modeled here.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Enrichment Demo -->
+  <section class="section">
+    <div class="section-title"><div><div class="kicker">Enterprise Enrichment (demo)</div><h2 class="h2">Turn anonymous visits into account insights</h2></div></div>
+    <div class="card">
+      <p class="sub" style="margin-top:0">Add <code>?demo_enrich=1</code> to simulate firmographics & intent (no paid API).</p>
+      <div class="tiles cols-4" style="margin-top:8px">
+        <div class="tile"><h3>Company</h3><div class="kv"><label>value</label><code id="enrich_company">—</code></div><p class="why"><strong>Why:</strong> Account match for ABM.</p><div class="do"><strong>Take action:</strong> Route to account owner; create CM on engagement.</div></div>
+        <div class="tile"><h3>Domain</h3><div class="kv"><label>value</label><code id="enrich_domain">—</code></div><p class="why"><strong>Why:</strong> Dedupe & join.</p><div class="do"><strong>Take action:</strong> Use domain to merge dup leads to the right account.</div></div>
+        <div class="tile"><h3>Industry</h3><div class="kv"><label>value</label><code id="enrich_industry">—</code></div><p class="why"><strong>Why:</strong> ICP alignment.</p><div class="do"><strong>Take action:</strong> Trigger vertical nurture by industry.</div></div>
+        <div class="tile"><h3>Employees</h3><div class="kv"><label>value</label><code id="enrich_employees">—</code></div><p class="why"><strong>Why:</strong> Tier & territory.</p><div class="do"><strong>Take action:</strong> Route 1k+ emp to enterprise team.</div></div>
+        <div class="tile"><h3>Est. Revenue</h3><div class="kv"><label>value</label><code id="enrich_revenue">—</code></div><p class="why"><strong>Why:</strong> Deal sizing.</p><div class="do"><strong>Take action:</strong> Set min pipeline thresholds by band.</div></div>
+        <div class="tile"><h3>Technologies</h3><div class="kv"><label>value</label><code id="enrich_tech">—</code></div><p class="why"><strong>Why:</strong> Integration story.</p><div class="do"><strong>Take action:</strong> Personalize CTA with stack fit (e.g., “Works with Salesforce”).</div></div>
+        <div class="tile"><h3>Intent Topics</h3><div class="kv"><label>value</label><code id="enrich_intent">—</code></div><p class="why"><strong>Why:</strong> Hot research themes.</p><div class="do"><strong>Take action:</strong> Launch air‑cover ads on those topics for matched accounts.</div></div>
+        <div class="tile"><h3>Confidence</h3><div class="kv"><label>value</label><code id="enrich_conf">—</code></div><p class="why"><strong>Why:</strong> Match quality signal.</p><div class="do"><strong>Take action:</strong> Gate sales alerts above 70% confidence.</div></div>
+      </div>
+      <div class="notice" style="margin-top:10px"><a id="enrichToggleBtn" class="btn secondary" href="#">Toggle demo on/off</a></div>
+    </div>
+  </section>
+
+  <!-- Engagement (tech detail kept last) -->
+  <section class="section">
+    <div class="section-title"><div><div class="kicker">Engagement</div><h2 class="h2">What this visitor actually did</h2></div></div>
+    <div class="tiles cols-4" style="margin-top:8px">
+      <div class="tile"><h3>Time on Page</h3><div class="kv"><label>value</label><code id="timeOnPage">0s</code></div><p class="why"><strong>Why:</strong> Intent proxy without identity.</p><div class="do"><strong>Take action:</strong> Use ≥60s as MQL booster.</div></div>
+      <div class="tile"><h3>Scroll Depth</h3><div class="kv"><label>value</label><code id="scrollDepth">0%</code></div><p class="why"><strong>Why:</strong> Content resonance.</p><div class="do"><strong>Take action:</strong> Move CTAs above average scroll cutoff.</div></div>
+      <div class="tile"><h3>Pageviews</h3><div class="kv"><label>value</label><code id="pageviews">1</code></div><p class="why"><strong>Why:</strong> Research behavior.</p><div class="do"><strong>Take action:</strong> Trigger remarketing after ≥3 pages per session.</div></div>
+    </div>
+  </section>
+
+  <!-- Journey & final CTA -->
+  <section class="section">
+    <div class="section-title"><div><div class="kicker">From Click to Revenue</div><h2 class="h2">How this all connects</h2></div></div>
     <div class="flow">
       <div class="step"><strong>1) Ad Click</strong><br><span class="sub">UTMs + click IDs captured</span></div>
       <div class="step"><strong>2) Web Session</strong><br><span class="sub">Device • Geo • Engagement</span></div>
@@ -367,39 +396,32 @@
     <div class="card" style="margin-top:10px"><div class="kicker">Projection (demo)</div><p class="sub">Click est. cost: <strong id="projCost">$4.00</strong> • Similar-click pipeline: <strong id="projPipe">$12,000</strong> • Close rate: <strong id="projClose">21%</strong> • Est. revenue: <strong id="projRev">$2,520</strong></p></div>
   </section>
 
-  <section class="section cta">
-    <div>
-      <div class="kicker">Next step</div>
-      <div class="h2" style="margin:0 0 6px">Connect your stack and prove ROI.</div>
-      <p class="sub" style="margin:0">We wire this into Salesforce and your ad platforms so Marketing, Sales, and Finance share one truth.</p>
-    </div>
-    <a class="btn" href="https://calendly.com/crmhacker_jonathan" target="_blank" rel="noopener">Book an ROI Strategy Call</a>
-  </section>
-
+  <!-- Utility buttons -->
   <section class="section tiles cols-4">
+    <a class="btn" href="https://calendly.com/crmhacker_jonathan" target="_blank" rel="noopener">Schedule Your Free ROI Blueprint</a>
     <button class="btn secondary" id="downloadPdfBtn">Download as PDF</button>
     <a class="btn secondary" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'})">Back to top</a>
   </section>
 
-  <div class="notice">This demo uses public signals only. For account-level identification and intent, we typically integrate a paid enrichment provider in client deployments.</div>
+  <div class="notice">This demo uses public signals only. For account‑level identification and intent, we integrate a paid enrichment provider; this page already shows the fields we map.</div>
 </main>
 
 <script>
-/* ========= helpers ========= */
+/* ===== helpers ===== */
 const SAFE={$:id=>document.getElementById(id),set:(id,v)=>{const el=SAFE.$(id);if(el)el.textContent=(v??"—")},on:(id,e,fn)=>{const el=SAFE.$(id);if(el)el.addEventListener(e,fn)},warn:(...a)=>console.warn("[ROI-DEMO]",...a),err:(...a)=>console.error("[ROI-DEMO]",...a)};
 window.addEventListener("error",e=>SAFE.err("window error:",e.message));
 window.addEventListener("unhandledrejection",e=>SAFE.err("unhandled promise:",e.reason));
 
-/* ========= params ========= */
+/* ===== params & grouping ===== */
 const COMMON=["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id","demo_enrich"];
 function parseQuery(){const out={};const q=location.search.replace(/^\?/,"");if(!q)return out;for(const p of q.split("&")){if(!p)continue;const[k,v=""]=p.split("=");out[decodeURIComponent(k||"").toLowerCase()]=decodeURIComponent(v||"")}return out;}
 function persistParams(){const p=parseQuery();const prev=JSON.parse(sessionStorage.getItem("params")||"{}");const next={...prev};for(const k of COMMON) if(p[k]) next[k]=p[k];next.landingUrl=location.href;sessionStorage.setItem("params",JSON.stringify(next));return next;}
 function referrer(){return document.referrer||"(direct / none)";}
 function group(params){const s=(params.utm_source||"").toLowerCase(),m=(params.utm_medium||"").toLowerCase();if(params.gclid)return"google-ads";if(params.li_fat_id)return"linkedin-ads";if(params.fbclid)return"meta-ads";if(params.msclkid)return"microsoft-ads";if(s.includes("linkedin"))return"linkedin";if(s.includes("google"))return"google-other";if(!s&&!document.referrer)return"direct";return`${s||"unknown"}-${m||"unknown"}`}
 
-/* ========= device ========= */
+/* ===== device ===== */
 function device(){const ua=navigator.userAgent||"";const mobile=/Mobi|Android/i.test(ua);const os=/Windows NT/i.test(ua)?"Windows":/Mac OS X/i.test(ua)?"macOS":/Android/i.test(ua)?"Android":/iPhone|iPad|iPod/i.test(ua)?"iOS":/Linux/i.test(ua)?"Linux":"Other";const browser=/Chrome/i.test(ua)&&!/Edg/i.test(ua)?"Chrome":/Edg/i.test(ua)?"Edge":/Firefox/i.test(ua)?"Firefox":/Safari/i.test(ua)&&!/Chrome/i.test(ua)?"Safari":/Opera|OPR/i.test(ua)?"Opera":"Other";return{type:mobile?"Mobile":"Desktop",os,browser,screen:`${screen.width}×${screen.height}`,ua}}
-/* ========= geo ========= */
+/* ===== geo ===== */
 function withTimeout(p,ms=3500){let t;return Promise.race([p,new Promise((_,r)=>t=setTimeout(()=>r(new Error("timeout")),ms))]).finally(()=>clearTimeout(t))}
 async function ipapi(){const r=await withTimeout(fetch("https://ipapi.co/json/"),3500);if(!r.ok)throw 0;const j=await r.json();return{ip:j.ip||null,city:j.city||null,region:j.region||null,country:j.country_name||j.country||null,org:j.org||j.asn||null}}
 async function ipwho(){const r=await withTimeout(fetch("https://ipwho.is/"),3500);if(!r.ok)throw 0;const j=await r.json();if(j&&j.success!==false){return{ip:j.ip||null,city:j.city||null,region:j.region||null,country:j.country||null,org:j.connection?.org||null}}throw 0}
@@ -407,29 +429,40 @@ async function geojs(){const r=await withTimeout(fetch("https://get.geojs.io/v1/
 async function ipify(){const r=await withTimeout(fetch("https://api.ipify.org?format=json"),3500);if(!r.ok)throw 0;const j=await r.json();return{ip:j.ip||null,city:null,region:null,country:null,org:null}}
 async function geo(){for(const fn of [ipapi,ipwho,geojs,ipify]){try{const g=await fn();if(g)return g}catch(e){}}return{ip:null,city:null,region:null,country:null,org:null}}
 
-/* ========= session ========= */
+/* ===== session ===== */
 const sess={start:Date.now(),scrollMax:0,pageviews:1,timeline:[]};
 (function(){try{const k="pv";const cur=Number(sessionStorage.getItem(k)||"0")+1;sessionStorage.setItem(k,String(cur));sess.pageviews=cur}catch(e){}})();
 addEventListener("scroll",()=>{try{const d=Math.round(100*(scrollY+innerHeight)/document.body.scrollHeight);sess.scrollMax=Math.min(100,Math.max(sess.scrollMax,d))}catch(e){}});
 setInterval(()=>{const t=Math.round((Date.now()-sess.start)/1000);sess.timeline.push({t,depth:sess.scrollMax});renderSession();try{updateEngageChart()}catch(e){}},1000);
 
-/* ========= render ========= */
-function renderAcq(p){SAFE.set("referrer",referrer());SAFE.set("landingUrl",p.landingUrl||location.href);["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id"].forEach(k=>SAFE.set(k,p[k]||"—"));const g=group(p);SAFE.set("campaignGroup",g)}
-function renderDev(d){["deviceType","os","browser","screen","ua"].forEach(k=>SAFE.set(k,d[k]));SAFE.set("ua_cap",d.ua)}
-function renderGeo(g){SAFE.set("ip",g.ip);SAFE.set("city",g.city);SAFE.set("region",g.region);SAFE.set("country",g.country);SAFE.set("org",g.org);SAFE.set("sfIP",g.ip||"—");SAFE.set("sfCity",g.city||"—");SAFE.set("sfRegion",g.region||"—");SAFE.set("sfCountry",g.country||"—");SAFE.set("sfOrg",g.org||"—")}
-function renderSession(){const t=Math.round((Date.now()-sess.start)/1000);SAFE.set("timeOnPage",`${t}s`);SAFE.set("scrollDepth",`${sess.scrollMax}%`);SAFE.set("pageviews",String(sess.pageviews))}
-
-/* ========= charts ========= */
+/* ===== charts ===== */
 let sourceDonut,deviceBar,engageLine;
 function initCharts(){if(!window.Chart)return;
   const red=getComputedStyle(document.documentElement).getPropertyValue('--brand').trim()||'#e41414';
-  const sd=SAFE.$('sourceDonut'); if(sd){sourceDonut=new Chart(sd,{type:'doughnut',data:{labels:['google-ads','linkedin-ads','email','direct','other'],datasets:[{data:[0,0,0,0,1],backgroundColor:[red,'#111','#9ca3af','#e5e7eb','#cbd5e1']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},cutout:'60%'}});}
-  const db=SAFE.$('deviceBar'); if(db){deviceBar=new Chart(db,{type:'bar',data:{labels:['Desktop/Windows','Desktop/macOS','Mobile/iOS','Mobile/Android'],datasets:[{label:'This visit',data:[0,0,0,0],backgroundColor:red},{label:'Example mix',data:[35,25,20,20],backgroundColor:'#e5e7eb'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true}}}});}
-  const el=SAFE.$('engageLine'); if(el){engageLine=new Chart(el,{type:'line',data:{labels:[],datasets:[{label:'Depth %',data:[],borderColor:red,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Seconds'}},y:{title:{display:true,text:'Scroll %'},suggestedMin:0,suggestedMax:100}}}});}
+  const sd=document.getElementById('sourceDonut'); if(sd){sourceDonut=new Chart(sd,{type:'doughnut',data:{labels:['google-ads','linkedin-ads','email','direct','other'],datasets:[{data:[0,0,0,0,1],backgroundColor:[red,'#111','#9ca3af','#e5e7eb','#cbd5e1']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},cutout:'60%'}});}
+  const db=document.getElementById('deviceBar'); if(db){deviceBar=new Chart(db,{type:'bar',data:{labels:['Desktop/Windows','Desktop/macOS','Mobile/iOS','Mobile/Android'],datasets:[{label:'This visit',data:[0,0,0,0],backgroundColor:red},{label:'Example mix',data:[35,25,20,20],backgroundColor:'#e5e7eb'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true}}}});}
+  const el=document.getElementById('engageLine'); if(el){engageLine=new Chart(el,{type:'line',data:{labels:[],datasets:[{label:'Depth %',data:[],borderColor:red,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Seconds'}},y:{title:{display:true,text:'Scroll %'},suggestedMin:0,suggestedMax:100}}}});}
 }
 function updateEngageChart(){if(!engageLine)return;const last=sess.timeline[sess.timeline.length-1];if(!last)return;engageLine.data.labels.push(last.t);engageLine.data.datasets[0].data.push(last.depth);if(engageLine.data.labels.length>60){engageLine.data.labels.shift();engageLine.data.datasets[0].data.shift();}engageLine.update()}
 
-/* ========= PDF ========= */
+/* ===== rendering ===== */
+function renderAcq(p){
+  SAFE.set("referrer",referrer()); SAFE.set("landingUrl",p.landingUrl||location.href);
+  ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id"].forEach(k=>SAFE.set(k,p[k]||"—"));
+  const g=group(p); SAFE.set("campaignGroup",g); SAFE.set("campaignGroupTop",g);
+}
+function renderDev(d){["deviceType","os","browser","screen","ua"].forEach(k=>SAFE.set(k,d[k])); SAFE.set("ua_cap",d.ua);}
+function renderGeo(g){
+  SAFE.set("ip",g.ip); SAFE.set("city",g.city); SAFE.set("region",g.region); SAFE.set("country",g.country); SAFE.set("org",g.org);
+  SAFE.set("sfIP",g.ip||"—"); SAFE.set("sfCity",g.city||"—"); SAFE.set("sfRegion",g.region||"—"); SAFE.set("sfCountry",g.country||"—"); SAFE.set("sfOrg",g.org||"—");
+}
+function renderSession(){
+  const t=Math.round((Date.now()-sess.start)/1000);
+  SAFE.set("timeOnPage",`${t}s`); SAFE.set("scrollDepth",`${sess.scrollMax}%`); SAFE.set("pageviews",String(sess.pageviews));
+  SAFE.set("engageSnap", `${t}s • ${sess.scrollMax}% • ${sess.pageviews} pv`);
+}
+
+/* ===== PDF ===== */
 SAFE.on("downloadPdfBtn","click",async ()=>{
   try{
     if(!window.jspdf||!window.jspdf.jsPDF) throw 0;
@@ -439,19 +472,18 @@ SAFE.on("downloadPdfBtn","click",async ()=>{
     const W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight();
     const m=24,w=W-m*2,ratio=canvas.height/canvas.width,h=w*ratio;
     pdf.text("CRM Hacker — Live Campaign ROI Demo",m,28);
-    if(h<=H-60){pdf.addImage(img,"PNG",m,40,w,h)}
-    else{const sliceH=H-80;let y=0,p=0;while(y<canvas.height){const c=document.createElement("canvas");c.width=canvas.width;c.height=Math.min(sliceH*canvas.width/w,canvas.height-y);c.getContext("2d").drawImage(canvas,0,y,canvas.width,c.height,0,0,c.width,c.height);const s=c.toDataURL("image/png");if(p>0)pdf.addPage();pdf.addImage(s,"PNG",m,40,w,(c.height/c.width)*w);y+=c.height;p++;}}
+    if(h<=H-60){pdf.addImage(img,"PNG",m,40,w,h)}else{const sliceH=H-80;let y=0,p=0;while(y<canvas.height){const c=document.createElement("canvas");c.width=canvas.width;c.height=Math.min(sliceH*canvas.width/w,canvas.height-y);c.getContext("2d").drawImage(canvas,0,y,canvas.width,c.height,0,0,c.width,c.height);const s=c.toDataURL("image/png");if(p>0)pdf.addPage();pdf.addImage(s,"PNG",m,40,w,(c.height/c.width)*w);y+=c.height;p++;}} 
     pdf.save("CRMH_Live_ROI_Demo.pdf");
   }catch(e){SAFE.warn("pdf failed",e)}
 });
 
-/* ========= SF tabs ========= */
+/* ===== SF tabs ===== */
 document.addEventListener("click",(e)=>{
   const t=e.target.closest(".sf-tab"); if(t){document.querySelectorAll(".sf-tab").forEach(b=>b.classList.remove("active")); t.classList.add("active"); document.querySelectorAll(".sf-pane").forEach(p=>p.hidden=true); const pane=document.getElementById(t.dataset.tab); if(pane) pane.hidden=false;}
   const sub=e.target.closest(".sf-tabbtn"); if(sub){const wrap=sub.closest(".sf-record"); wrap.querySelectorAll(".sf-tabbtn").forEach(x=>x.classList.remove("active")); sub.classList.add("active"); wrap.querySelectorAll(".sf-section").forEach(s=>s.hidden=true); const tgt=wrap.querySelector(`#${sub.dataset.tab}`); if(tgt) tgt.hidden=false;}
 });
 
-/* ========= Enrichment demo ========= */
+/* ===== Enrichment demo ===== */
 function isDemo(p){return String((p.demo_enrich||"")).toLowerCase()==="1"}
 function simulate(params,geo){
   const seed=(geo?.ip||params?.utm_campaign||"crmh").toLowerCase();
@@ -459,20 +491,21 @@ function simulate(params,geo){
                {company:"Northstar FinTech",domain:"northstarfin.com",industry:"Financial Services",employees:"1k-5k",revenue:"$500M–$1B",tech:["Salesforce","Pardot","Snowflake"],intent:["Pipeline influence","Attribution modeling"]},
                {company:"Vertex Cloud",domain:"vertexcloud.io",industry:"Information Technology",employees:"100-250",revenue:"$10M–$50M",tech:["Salesforce","GA4","Segment"],intent:["Lead scoring","Multi-touch ROI"]}];
   let h=0;for(let i=0;i<seed.length;i++) h=((h<<5)-h)+seed.charCodeAt(i);
-  const row=picks[Math.abs(h)%picks.length]; return {...row,confidence: (70+Math.abs(h)%20)+"%"}
+  const row=picks[Math.abs(h)%picks.length]; return {...row,confidence:(70+Math.abs(h)%20)+"%"}
 }
 function renderEnrich(e){SAFE.set("enrich_company",e?.company||"—");SAFE.set("enrich_domain",e?.domain||"—");SAFE.set("enrich_industry",e?.industry||"—");SAFE.set("enrich_employees",e?.employees||"—");SAFE.set("enrich_revenue",e?.revenue||"—");SAFE.set("enrich_tech",(e?.tech||[]).join(", ")||"—");SAFE.set("enrich_intent",(e?.intent||[]).join(", ")||"—");SAFE.set("enrich_conf",e?.confidence||"—")}
 function enrichToSF(e){if(!e)return;SAFE.set("sfLeadCompany",e.company);SAFE.set("sfAccount",e.company);SAFE.set("sfOppAccount",e.company)}
 SAFE.on("enrichToggleBtn","click",(ev)=>{ev.preventDefault();const url=new URL(location.href);url.searchParams.set("demo_enrich",url.searchParams.get("demo_enrich")==="1"?"0":"1");location.href=url.toString();});
 
-/* ========= init ========= */
+/* ===== INIT ===== */
 (async function(){
   const p=persistParams();
   const d=device(); renderAcq(p); renderDev(d);
+
   let g={}; try{g=await geo(); renderGeo(g)}catch(e){}
   if(window.Chart) initCharts();
 
-  // Salesforce sample values mapped
+  // Salesforce sample & outcomes strings
   SAFE.set("sfLeadName","Taylor Example");
   SAFE.set("sfLeadEmail","taylor@example.com");
   SAFE.set("sfLeadSource",group(p));
@@ -485,10 +518,10 @@ SAFE.on("enrichToggleBtn","click",(ev)=>{ev.preventDefault();const url=new URL(l
   SAFE.set("sfDevice",`${d.type} • ${d.os} • ${d.browser} • ${d.screen}`);
   SAFE.set("sfCreated",new Date().toLocaleString());
 
-  // optional enrichment
+  // Enrichment (optional)
   if(isDemo(p)){const e=simulate(p,g); renderEnrich(e); enrichToSF(e);}
 
-  // Opp + models
+  // Opportunity + models (simple demo values)
   const amount=25000, cm=p.utm_campaign||"CRMH — ROI Demo";
   const revFT=Math.round(amount*1.0), revLT=Math.round(amount*1.0), revLIN=Math.round(amount*1.0), revW=Math.round(amount*1.0);
   SAFE.set("sfCmName","Taylor Example"); SAFE.set("sfCampaign",cm);
@@ -505,25 +538,23 @@ SAFE.on("enrichToggleBtn","click",(ev)=>{ev.preventDefault();const url=new URL(l
   SAFE.set("sfLIN", revLIN.toLocaleString('en-US',{style:'currency',currency:'USD'}));
   SAFE.set("sfW",   revW  .toLocaleString('en-US',{style:'currency',currency:'USD'}));
 
-  // ROI table + small charts
+  // ROI table
   const rows=[
     {name:"ROI Demo – Google Ads", spend:1200, pipeline:48000, revenue:revFT,  model:"First Touch"},
     {name:"ROI Ebook – LinkedIn",  spend: 800, pipeline:22000, revenue:Math.round(amount*0.10), model:"Assist/Linear"},
     {name:"ROI Webinar – Email",   spend: 300, pipeline:15000, revenue:Math.round(amount*0.20), model:"W-Shaped"},
     {name:cm,                      spend:1000, pipeline:30000, revenue:revLT,  model:"Last Touch"}
   ];
-  const tbody=SAFE.$("roiTableBody"); if(tbody){tbody.innerHTML=""; rows.forEach(r=>{const roi=((r.revenue-r.spend)/Math.max(1,r.spend))*100; const tr=document.createElement("tr"); tr.innerHTML=`
+  const tbody=document.getElementById("roiTableBody"); if(tbody){tbody.innerHTML=""; rows.forEach(r=>{const roi=((r.revenue-r.spend)/Math.max(1,r.spend))*100; const tr=document.createElement("tr"); tr.innerHTML=`
     <td>${r.name}</td><td>${r.spend.toLocaleString('en-US',{style:'currency',currency:'USD'})}</td>
     <td>${r.pipeline.toLocaleString('en-US',{style:'currency',currency:'USD'})}</td>
     <td>${r.revenue.toLocaleString('en-US',{style:'currency',currency:'USD'})}</td>
     <td>${roi.toFixed(0)}%</td><td>${r.model}</td>`; tbody.appendChild(tr);});}
-  if(window.Chart){
-    new Chart(document.getElementById("modelBar"),{type:'bar',data:{labels:['First-Touch','Last-Touch','Linear','W-Shaped'],datasets:[{label:'Revenue $',data:[revFT,revLT,revLIN,revW],backgroundColor:['#111','var(--brand)','#9ca3af','#e5e7eb']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
-    new Chart(document.getElementById("touchDist"),{type:'doughnut',data:{labels:['First','Assist','Lead','Last'],datasets:[{data:[1,1,1,1],backgroundColor:['var(--brand)','#111','#9ca3af','#e5e7eb']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},cutout:'60%'}});
-  }
 
-  // projection
+  // Headline outcomes strings
   SAFE.set("projCost","$4.00"); SAFE.set("projPipe","$12,000"); SAFE.set("projClose","21%"); SAFE.set("projRev","$2,520");
+  SAFE.set("projSummary", `Model agree + ${amount.toLocaleString('en-US',{style:'currency',currency:'USD'})} opp → FT/LT/Linear/W show attribution shares to reallocate budget with confidence.`);
+  SAFE.set("leadSnap", "Lead stamped with UTMs, Click IDs, Device, Geo, Created Date, Owner");
 })();
 </script>
 </body>
