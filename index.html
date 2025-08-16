@@ -14,6 +14,15 @@
     --brand:#e41414; --brand-ink:#000; --brand-soft:#ffe5e5;
     --radius:14px; --shadow:0 8px 24px rgba(0,0,0,.06);
   }
+
+  /* Compact, full-width Click IDs row */
+.cid-grid{
+  display:grid; gap:8px;
+  grid-template-columns: repeat(5, minmax(140px, 1fr));
+}
+@media (max-width: 980px){ .cid-grid{ grid-template-columns: repeat(3, minmax(140px,1fr)); } }
+@media (max-width: 640px){ .cid-grid{ grid-template-columns: repeat(1, minmax(140px,1fr)); } }
+
   *{box-sizing:border-box}
   html,body{height:100%;overflow-x:hidden}
   body{margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
@@ -300,30 +309,77 @@
 
   <!-- ================== DETAILS AFTER OUTCOMES ================== -->
 
-  <!-- Acquisition & Attribution (expanded guidance) -->
-  <section class="section">
-    <div class="section-title"><div><div class="kicker">Acquisition & Attribution</div><h2 class="h2">The signals that power ROI</h2></div></div>
-    <div class="tiles cols-4" style="margin-top:8px">
-      <div class="tile"><h3>Referrer</h3><div class="kv"><label>value</label><code id="referrer">—</code></div><p class="why"><strong>Why:</strong> Distinguishes paid/organic/partner/direct; fixes “Direct” buckets.</p><div class="do"><strong>Take action:</strong> Investigate any spike in Direct with unchanged spend—usually UTMs dropped.</div></div>
-      <div class="tile"><h3>Landing URL</h3><div class="kv"><label>value</label><code id="landingUrl">—</code></div><p class="why"><strong>Why:</strong> Keeps UTMs intact across steps/sessions.</p><div class="do"><strong>Take action:</strong> Persist UTMs to local storage/session and re‑append on form pages.</div></div>
-      <div class="tile"><h3>utm_source</h3><div class="kv"><label>value</label><code id="utm_source">—</code></div><p class="why"><strong>Why:</strong> Primary channel grouping.</p><div class="do"><strong>Take action:</strong> Enforce lowercase, whitelist allowed values.</div></div>
-      <div class="tile"><h3>utm_medium</h3><div class="kv"><label>value</label><code id="utm_medium">—</code></div><p class="why"><strong>Why:</strong> Traffic type (cpc/social/email).</p><div class="do"><strong>Take action:</strong> Map platform terms (e.g., <em>paid_social</em>) into your standard set.</div></div>
-      <div class="tile"><h3>utm_campaign</h3><div class="kv"><label>value</label><code id="utm_campaign">—</code></div><p class="why"><strong>Why:</strong> Budget/goal unit.</p><div class="do"><strong>Take action:</strong> Prefix campaigns with channel & quarter for reporting (e.g., <code>li_q3_roi_demo</code>).</div></div>
-      <div class="tile"><h3>utm_content</h3><div class="kv"><label>value</label><code id="utm_content">—</code></div><p class="why"><strong>Why:</strong> Creative/variant for A/Bs.</p><div class="do"><strong>Take action:</strong> Use short IDs that map to a creative library.</div></div>
-      <div class="tile"><h3>utm_term</h3><div class="kv"><label>value</label><code id="utm_term">—</code></div><p class="why"><strong>Why:</strong> Keyword insights.</p><div class="do"><strong>Take action:</strong> Weekly negative/expansion pass using ROI not just CPC.</div></div>
-      <div class="tile">
-        <h3>Click IDs</h3>
-        <div class="kv"><label>gclid</label><code id="gclid">—</code></div>
-        <div class="kv" style="margin-top:6px"><label>fbclid</label><code id="fbclid">—</code></div>
-        <div class="kv" style="margin-top:6px"><label>msclkid</label><code id="msclkid">—</code></div>
-        <div class="kv" style="margin-top:6px"><label>ttclid</label><code id="ttclid">—</code></div>
-        <div class="kv" style="margin-top:6px"><label>li_fat_id</label><code id="li_fat_id">—</code></div>
-        <p class="why"><strong>Why:</strong> Join keys for offline conversions.</p>
-        <div class="do"><strong>Take action:</strong> On Closed‑Won, push attributed revenue back to each platform using its click ID.</div>
-      </div>
-      <div class="tile"><h3>Campaign Group</h3><div class="kv"><label>value</label><code id="campaignGroup">—</code></div><p class="why"><strong>Why:</strong> Quick channel dashboards.</p><div class="do"><strong>Take action:</strong> Auto‑derive group from UTMs/click IDs on capture.</div></div>
+ <!-- ACQUISITION (reordered: UTM + Campaign Group inline, Click IDs full-width) -->
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="kicker">Acquisition & Attribution</div>
+      <h2 class="h2">Where did this click come from?</h2>
+      <p class="lead">Compact tiles; long values wrap fully. Perfect for Salesforce field stamping and platform de-dupe.</p>
     </div>
-  </section>
+  </div>
+
+  <!-- Row 1: Referrer + Landing URL + Source + Medium -->
+  <div class="tiles cols-4" style="margin-top:8px">
+    <div class="tile">
+      <h3>Referrer</h3>
+      <div class="kv"><label>value</label><code id="referrer">—</code></div>
+      <p class="why"><strong>Why:</strong> Separate paid/organic/partner/direct.<br><strong>Take action:</strong> Investigate “Direct” spikes—usually dropped UTMs.</p>
+    </div>
+    <div class="tile">
+      <h3>Landing URL</h3>
+      <div class="kv"><label>value</label><code id="landingUrl">—</code></div>
+      <p class="why"><strong>Why:</strong> Persist UTMs across steps/sessions.<br><strong>Take action:</strong> Re-append stored UTMs on form pages.</p>
+    </div>
+    <div class="tile">
+      <h3>utm_source</h3>
+      <div class="kv"><label>value</label><code id="utm_source">—</code></div>
+      <p class="why"><strong>Why:</strong> Primary channel grouping.<br><strong>Take action:</strong> Enforce lowercase and a whitelist.</p>
+    </div>
+    <div class="tile">
+      <h3>utm_medium</h3>
+      <div class="kv"><label>value</label><code id="utm_medium">—</code></div>
+      <p class="why"><strong>Why:</strong> Traffic type (cpc/social/email).<br><strong>Take action:</strong> Map platform labels into your standard set.</p>
+    </div>
+
+    <!-- Row 2: Campaign + Content + Term + Campaign Group (inline with UTM tiles) -->
+    <div class="tile">
+      <h3>utm_campaign</h3>
+      <div class="kv"><label>value</label><code id="utm_campaign">—</code></div>
+      <p class="why"><strong>Why:</strong> Budget/goal unit.<br><strong>Take action:</strong> Prefix with channel & quarter (e.g., <code>li_q3_roi_demo</code>).</p>
+    </div>
+    <div class="tile">
+      <h3>utm_content</h3>
+      <div class="kv"><label>value</label><code id="utm_content">—</code></div>
+      <p class="why"><strong>Why:</strong> Creative/variant for A/Bs.<br><strong>Take action:</strong> Use short IDs tied to a creative library.</p>
+    </div>
+    <div class="tile">
+      <h3>utm_term</h3>
+      <div class="kv"><label>value</label><code id="utm_term">—</code></div>
+      <p class="why"><strong>Why:</strong> Keyword insights.<br><strong>Take action:</strong> Weekly negation/expansion by **ROI**, not CPC.</p>
+    </div>
+    <div class="tile">
+      <h3>Campaign Group</h3>
+      <div class="kv"><label>value</label><code id="campaignGroup">—</code></div>
+      <p class="why"><strong>Why:</strong> Quick channel dashboards.<br><strong>Take action:</strong> Auto-derive from UTMs/click IDs on capture.</p>
+    </div>
+
+    <!-- Row 3: Click IDs (full width of 4 columns) -->
+    <div class="tile" style="grid-column:span 4">
+      <h3>Click IDs (Full-Width)</h3>
+      <div class="cid-grid">
+        <div class="kv"><label>gclid</label><code id="gclid">—</code></div>
+        <div class="kv"><label>fbclid</label><code id="fbclid">—</code></div>
+        <div class="kv"><label>msclkid</label><code id="msclkid">—</code></div>
+        <div class="kv"><label>ttclid</label><code id="ttclid">—</code></div>
+        <div class="kv"><label>li_fat_id</label><code id="li_fat_id">—</code></div>
+      </div>
+      <p class="why" style="margin-top:6px"><strong>Why:</strong> Join keys for offline conversions and lift studies.<br>
+      <strong>Take action:</strong> On Closed-Won, push attributed revenue back to each platform using its click ID to improve bidding.</p>
+    </div>
+  </div>
+</section>
+
 
   <!-- Device & Environment -->
   <section class="section">
@@ -517,7 +573,10 @@ SAFE.on("enrichToggleBtn","click",(ev)=>{ev.preventDefault();const url=new URL(l
   SAFE.set("sfClickIds",clickIds);
   SAFE.set("sfDevice",`${d.type} • ${d.os} • ${d.browser} • ${d.screen}`);
   SAFE.set("sfCreated",new Date().toLocaleString());
-
+const g = group(p);
+  SAFE.set("campaignGroup", g);
+  SAFE.set("campaignGroupTop", g); // ensures Outcomes card shows same Campaign Group
+  
   // Enrichment (optional)
   if(isDemo(p)){const e=simulate(p,g); renderEnrich(e); enrichToSF(e);}
 
