@@ -9,17 +9,16 @@
 
 <style>
   :root{
-    /* CRM Hacker light theme with teal accents + optional red for highlights */
     --bg:#ffffff; --text:#0f172a; --muted:#475569; --line:#e2e8f0; --card:#ffffff;
-    --brand:#15a3d4; --brand2:#06b6d4; --highlight:#e11d2e; /* red from logo */
-    --shadow:0 8px 24px rgba(15,23,42,.06); --radius:14px;
+    --brand:#15a3d4; --brand2:#06b6d4; --shadow:0 8px 24px rgba(15,23,42,.06); --radius:14px;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
+  html,body{overflow-x:hidden} /* stop any accidental horizontal scroll */
   body{margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
   img{max-width:100%;height:auto;display:block}
 
-  .container{max-width:1200px;margin:0 auto;padding:clamp(14px,2vw,28px)}
+  .container{max-width:1200px;margin:0 auto;padding:clamp(12px,2vw,24px)}
 
   /* HEADER */
   .hero{
@@ -29,52 +28,54 @@
       var(--bg);
     border-bottom:1px solid var(--line);
   }
-  .hero-inner{display:flex;gap:18px;align-items:center;padding:26px 0;flex-wrap:wrap}
-  .brand{display:flex;align-items:center;gap:14px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px}
-  .logoBox{width:58px;height:58px;border-radius:12px;display:grid;place-items:center;overflow:hidden;background:#000;box-shadow:var(--shadow)}
+  .hero-inner{display:flex;gap:16px;align-items:center;padding:22px 0;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 10px}
+  .logoBox{width:54px;height:54px;border-radius:12px;display:grid;place-items:center;overflow:hidden;background:#000;box-shadow:var(--shadow)}
   .logoBox img{width:100%;height:100%;object-fit:contain;background:#000}
-  h1{font-size:clamp(24px,4vw,40px);line-height:1.1;margin:0 0 6px}
+  h1{font-size:clamp(22px,4vw,36px);line-height:1.1;margin:0 0 4px}
   .sub{color:var(--muted);margin:0}
 
   /* SECTIONS */
-  .section{margin:28px 0}
-  .section-title{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:10px}
+  .section{margin:22px 0}
+  .section-title{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:8px}
   .kicker{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
   .h2{font-size:22px;margin:2px 0 0}
-  .lead{color:var(--muted);margin:8px 0 0}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+  .lead{color:var(--muted);margin:6px 0 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px;box-shadow:var(--shadow)}
 
-  /* TILES (autosize to content; compact) */
+  /* TILES: compact and auto-height (no tall UTM section) */
   .tiles{display:grid;gap:10px}
   @media(min-width:1040px){.tiles.cols-4{grid-template-columns:repeat(4,1fr)}}
   @media(min-width:680px) and (max-width:1039px){.tiles.cols-4{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:679px){.tiles.cols-4{grid-template-columns:1fr}}
-  .tile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:var(--shadow)}
+  .tile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;box-shadow:var(--shadow)}
   .tile h3{font-size:14px;margin:0 0 6px}
-  .kv{display:block;border:1px dashed var(--line);padding:8px 10px;border-radius:10px;background:#fafcff}
+
+  .kv{display:block;border:1px dashed var(--line);padding:6px 8px;border-radius:10px;background:#fafcff}
   .kv label{display:inline-block;color:var(--muted);font-size:11px;margin-bottom:6px}
-  /* IMPORTANT: show full values — wrap, never ellipsis */
+  /* FULL VALUE DISPLAY: wrap everywhere, never ellipsis */
   .kv code{
     display:block;
     font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
     background:#f8fafc;border:1px solid var(--line);padding:6px 8px;border-radius:8px;
-    white-space:normal; overflow:visible; text-overflow:clip; word-break:break-all;
+    white-space:normal; overflow:visible; text-overflow:clip;
+    word-break:break-word; overflow-wrap:anywhere;
   }
   .why{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.55}
 
   /* FLOW & CTA */
-  .flow{display:grid;gap:10px;margin-top:6px}
+  .flow{display:grid;gap:8px;margin-top:6px}
   @media(min-width:900px){.flow{grid-template-columns:repeat(5,1fr)}}
-  .step{position:relative;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:var(--shadow)}
+  .step{position:relative;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:var(--shadow)}
   .step:after{content:"→";position:absolute;right:-10px;top:50%;transform:translateY(-50%);color:#94a3b8}
   .step:last-child:after{display:none}
   .sm{font-size:12px;color:var(--muted)}
-  .cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:#f7fdff;border:1px solid var(--line);border-radius:12px;padding:14px}
+  .cta{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:#f7fdff;border:1px solid var(--line);border-radius:12px;padding:12px}
   .btn{background:var(--brand);color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;box-shadow:var(--shadow);text-decoration:none;display:inline-block}
   .btn.secondary{background:#fff;color:#0f172a;border:1px solid var(--line)}
 
   /* CHARTS */
-  .chart-grid{display:grid;gap:12px}
+  .chart-grid{display:grid;gap:10px}
   @media(min-width:980px){.chart-grid.cols-3{grid-template-columns:2fr 1fr 1fr}}
   .card canvas{width:100% !important;height:220px !important;display:block}
   @media(max-width:480px){.card canvas{height:170px !important}}
@@ -102,7 +103,11 @@
   .sf-field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
 
   .notice{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:10px}
-  .footer{color:var(--muted);font-size:12px;margin:24px 0}
+  .footer{color:var(--muted);font-size:12px;margin:20px 0}
+
+  /* Tables should never overflow */
+  table{max-width:100%}
+  td,th{word-break:break-word;overflow-wrap:anywhere}
 </style>
 
 <!-- CDNs -->
@@ -115,10 +120,7 @@
 <header class="hero">
   <div class="container hero-inner">
     <div class="brand">
-      <div class="logoBox">
-        <!-- Put crm-hacker-logo.png next to this file -->
-        <img src="crm-hacker-logo.png" alt="CRM Hacker" />
-      </div>
+      <div class="logoBox"><img src="crm-hacker-logo.png" alt="CRM Hacker" /></div>
       <div>
         <div style="font-weight:800">CRM Hacker</div>
         <div class="sub">Salesforce & RevOps done right</div>
@@ -140,42 +142,14 @@
     <div class="section-title"><div><div class="kicker">Acquisition & Attribution</div><h2 class="h2">Where did this click come from?</h2></div></div>
     <p class="lead">These fields power channel/campaign/keyword ROI and platform de-dupe.</p>
 
-    <div class="tiles cols-4" style="margin-top:10px">
-      <div class="tile">
-        <h3>Referrer</h3>
-        <div class="kv"><label>value</label><code id="referrer">—</code></div>
-        <p class="why"><strong>Why:</strong> Distinguish paid, organic, partner, direct. <strong>Do:</strong> Use for channel grouping & “direct” audits.</p>
-      </div>
-      <div class="tile">
-        <h3>Landing URL</h3>
-        <div class="kv"><label>value</label><code id="landingUrl">—</code></div>
-        <p class="why"><strong>Why:</strong> Persist UTMs across pages/sessions. <strong>Do:</strong> Log on Lead for audit/BI.</p>
-      </div>
-      <div class="tile">
-        <h3>utm_source</h3>
-        <div class="kv"><label>value</label><code id="utm_source">—</code></div>
-        <p class="why"><strong>Why:</strong> Channel (google, linkedin…). <strong>Do:</strong> Normalize to your channel taxonomy.</p>
-      </div>
-      <div class="tile">
-        <h3>utm_medium</h3>
-        <div class="kv"><label>value</label><code id="utm_medium">—</code></div>
-        <p class="why"><strong>Why:</strong> cpc, social, email. <strong>Do:</strong> Standardize for clean ROI by medium.</p>
-      </div>
-      <div class="tile">
-        <h3>utm_campaign</h3>
-        <div class="kv"><label>value</label><code id="utm_campaign">—</code></div>
-        <p class="why"><strong>Why:</strong> Budget & goals at campaign. <strong>Do:</strong> Shift spend by ROI.</p>
-      </div>
-      <div class="tile">
-        <h3>utm_content</h3>
-        <div class="kv"><label>value</label><code id="utm_content">—</code></div>
-        <p class="why"><strong>Why:</strong> Creative/variant ID. <strong>Do:</strong> A/B test winners → scale.</p>
-      </div>
-      <div class="tile">
-        <h3>utm_term</h3>
-        <div class="kv"><label>value</label><code id="utm_term">—</code></div>
-        <p class="why"><strong>Why:</strong> Keyword. <strong>Do:</strong> Negatives/expansion by ROI.</p>
-      </div>
+    <div class="tiles cols-4" style="margin-top:8px">
+      <div class="tile"><h3>Referrer</h3><div class="kv"><label>value</label><code id="referrer">—</code></div><p class="why"><strong>Why:</strong> Distinguish paid/organic/partner/direct. <strong>Do:</strong> Channel grouping & “direct” audits.</p></div>
+      <div class="tile"><h3>Landing URL</h3><div class="kv"><label>value</label><code id="landingUrl">—</code></div><p class="why"><strong>Why:</strong> Persist UTMs across pages/sessions. <strong>Do:</strong> Log on Lead for audit/BI.</p></div>
+      <div class="tile"><h3>utm_source</h3><div class="kv"><label>value</label><code id="utm_source">—</code></div><p class="why"><strong>Why:</strong> Channel (google, linkedin…). <strong>Do:</strong> Normalize taxonomy.</p></div>
+      <div class="tile"><h3>utm_medium</h3><div class="kv"><label>value</label><code id="utm_medium">—</code></div><p class="why"><strong>Why:</strong> cpc, social, email. <strong>Do:</strong> Standardize for clean ROI.</p></div>
+      <div class="tile"><h3>utm_campaign</h3><div class="kv"><label>value</label><code id="utm_campaign">—</code></div><p class="why"><strong>Why:</strong> Budget & goals at campaign. <strong>Do:</strong> Shift spend by ROI.</p></div>
+      <div class="tile"><h3>utm_content</h3><div class="kv"><label>value</label><code id="utm_content">—</code></div><p class="why"><strong>Why:</strong> Creative/variant. <strong>Do:</strong> Scale winners.</p></div>
+      <div class="tile"><h3>utm_term</h3><div class="kv"><label>value</label><code id="utm_term">—</code></div><p class="why"><strong>Why:</strong> Keyword. <strong>Do:</strong> Negatives/expansion.</p></div>
       <div class="tile">
         <h3>Click IDs</h3>
         <div class="kv"><label>gclid</label><code id="gclid">—</code></div>
@@ -183,37 +157,33 @@
         <div class="kv" style="margin-top:6px"><label>msclkid</label><code id="msclkid">—</code></div>
         <div class="kv" style="margin-top:6px"><label>ttclid</label><code id="ttclid">—</code></div>
         <div class="kv" style="margin-top:6px"><label>li_fat_id</label><code id="li_fat_id">—</code></div>
-        <p class="why"><strong>Why:</strong> Join keys for offline conversions & lift. <strong>Do:</strong> Push back to ad platforms.</p>
+        <p class="why"><strong>Why:</strong> Offline conversions & lift. <strong>Do:</strong> Push back to platforms.</p>
       </div>
-      <div class="tile">
-        <h3>Campaign Group</h3>
-        <div class="kv"><label>value</label><code id="campaignGroup">—</code></div>
-        <p class="why"><strong>Why:</strong> Auto-bucket source. <strong>Do:</strong> Quick channel dashboards.</p>
-      </div>
+      <div class="tile"><h3>Campaign Group</h3><div class="kv"><label>value</label><code id="campaignGroup">—</code></div><p class="why"><strong>Why:</strong> Auto-bucket. <strong>Do:</strong> Quick channel dashboards.</p></div>
     </div>
   </section>
 
   <!-- DEVICE -->
   <section class="section">
     <div class="section-title"><div><div class="kicker">Device & Environment</div><h2 class="h2">How are they experiencing your page?</h2></div></div>
-    <div class="tiles cols-4" style="margin-top:10px">
-      <div class="tile"><h3>Device Type</h3><div class="kv"><label>value</label><code id="deviceType">—</code></div><p class="why"><strong>Why:</strong> Mobile vs desktop. <strong>Do:</strong> Mobile-first CRO on mobile-heavy sources.</p></div>
-      <div class="tile"><h3>OS</h3><div class="kv"><label>value</label><code id="os">—</code></div><p class="why"><strong>Why:</strong> QA & specs. <strong>Do:</strong> Fix OS-specific bugs.</p></div>
+    <div class="tiles cols-4" style="margin-top:8px">
+      <div class="tile"><h3>Device Type</h3><div class="kv"><label>value</label><code id="deviceType">—</code></div><p class="why"><strong>Why:</strong> Layout & CTAs. <strong>Do:</strong> Mobile-first CRO.</p></div>
+      <div class="tile"><h3>OS</h3><div class="kv"><label>value</label><code id="os">—</code></div><p class="why"><strong>Why:</strong> QA & specs. <strong>Do:</strong> Fix OS bugs.</p></div>
       <div class="tile"><h3>Browser</h3><div class="kv"><label>value</label><code id="browser">—</code></div><p class="why"><strong>Why:</strong> Rendering quirks. <strong>Do:</strong> Safari fixes.</p></div>
-      <div class="tile"><h3>Screen</h3><div class="kv"><label>value</label><code id="screen">—</code></div><p class="why"><strong>Why:</strong> Above-the-fold. <strong>Do:</strong> Resize hero for common screens.</p></div>
-      <div class="tile" style="grid-column:span 4"><h3>User Agent</h3><div class="kv"><label>value</label><code id="ua">—</code></div><p class="why"><strong>Why:</strong> Debug & client hints. <strong>Do:</strong> Support triage.</p></div>
+      <div class="tile"><h3>Screen</h3><div class="kv"><label>value</label><code id="screen">—</code></div><p class="why"><strong>Why:</strong> Above-the-fold. <strong>Do:</strong> Place hero/CTA.</p></div>
+      <div class="tile" style="grid-column:span 4"><h3>User Agent</h3><div class="kv"><label>value</label><code id="ua">—</code></div><p class="why"><strong>Why:</strong> Debugging. <strong>Do:</strong> Support triage.</p></div>
     </div>
   </section>
 
   <!-- GEO -->
   <section class="section">
     <div class="section-title"><div><div class="kicker">Geo & Org</div><h2 class="h2">Where is this click coming from?</h2></div></div>
-    <div class="tiles cols-4" style="margin-top:10px">
+    <div class="tiles cols-4" style="margin-top:8px">
       <div class="tile"><h3>IP</h3><div class="kv"><label>value</label><code id="ip">—</code></div><p class="why"><strong>Why:</strong> Fraud/geo joins. <strong>Do:</strong> Block suspicious ranges.</p></div>
       <div class="tile"><h3>City</h3><div class="kv"><label>value</label><code id="city">—</code></div><p class="why"><strong>Why:</strong> Localization. <strong>Do:</strong> Region-based offers.</p></div>
-      <div class="tile"><h3>Region</h3><div class="kv"><label>value</label><code id="region">—</code></div><p class="why"><strong>Why:</strong> Territory routing. <strong>Do:</strong> Assign to correct AE.</p></div>
+      <div class="tile"><h3>Region / State</h3><div class="kv"><label>value</label><code id="region">—</code></div><p class="why"><strong>Why:</strong> Territory routing. <strong>Do:</strong> Assign to correct AE.</p></div>
       <div class="tile"><h3>Country</h3><div class="kv"><label>value</label><code id="country">—</code></div><p class="why"><strong>Why:</strong> Compliance & pricing. <strong>Do:</strong> Geo pricing.</p></div>
-      <div class="tile"><h3>Org / ASN</h3><div class="kv"><label>value</label><code id="org">—</code></div><p class="why"><strong>Why:</strong> Sometimes shows corporate network. <strong>Do:</strong> Helpful hint for ABM routing.</p></div>
+      <div class="tile"><h3>Org / ASN</h3><div class="kv"><label>value</label><code id="org">—</code></div><p class="why"><strong>Why:</strong> Sometimes shows corporate network. <strong>Do:</strong> ABM routing hint.</p></div>
 
       <div class="tile" style="grid-column:span 4">
         <h3>Confidence</h3>
@@ -227,11 +197,11 @@
   <section class="section">
     <div class="section-title"><div><div class="kicker">Enterprise Enrichment (demo)</div><h2 class="h2">Turn anonymous visits into account insights</h2></div></div>
     <div class="card">
-      <p class="lead" style="margin-top:0">Use <code>?demo_enrich=1</code> in the URL to simulate Clearbit/6sense-style firmographics & intent (no paid API).</p>
+      <p class="lead" style="margin-top:0">Use <code>?demo_enrich=1</code> in the URL to simulate firmographics & intent (no paid API).</p>
       <div class="tiles cols-4" style="margin-top:8px">
-        <div class="tile"><h3>Company</h3><div class="kv"><label>value</label><code id="enrich_company">—</code></div><p class="why"><strong>Why:</strong> Account match. <strong>Do:</strong> Route to owning team.</p></div>
+        <div class="tile"><h3>Company</h3><div class="kv"><label>value</label><code id="enrich_company">—</code></div><p class="why"><strong>Why:</strong> Account match. <strong>Do:</strong> Route to owner.</p></div>
         <div class="tile"><h3>Domain</h3><div class="kv"><label>value</label><code id="enrich_domain">—</code></div><p class="why"><strong>Why:</strong> Dedupe/merge. <strong>Do:</strong> Web-to-Lead stamping.</p></div>
-        <div class="tile"><h3>Industry</h3><div class="kv"><label>value</label><code id="enrich_industry">—</code></div><p class="why"><strong>Why:</strong> ICP fit. <strong>Do:</strong> Talk tracks by vertical.</p></div>
+        <div class="tile"><h3>Industry</h3><div class="kv"><label>value</label><code id="enrich_industry">—</code></div><p class="why"><strong>Why:</strong> ICP fit. <strong>Do:</strong> Messaging by vertical.</p></div>
         <div class="tile"><h3>Employees</h3><div class="kv"><label>value</label><code id="enrich_employees">—</code></div><p class="why"><strong>Why:</strong> Tiering. <strong>Do:</strong> Territory assignment.</p></div>
         <div class="tile"><h3>Est. Revenue</h3><div class="kv"><label>value</label><code id="enrich_revenue">—</code></div><p class="why"><strong>Why:</strong> TAM. <strong>Do:</strong> Deal sizing.</p></div>
         <div class="tile"><h3>Technologies</h3><div class="kv"><label>value</label><code id="enrich_tech">—</code></div><p class="why"><strong>Why:</strong> Stack fit. <strong>Do:</strong> Position integrations.</p></div>
@@ -239,7 +209,6 @@
         <div class="tile"><h3>Confidence</h3><div class="kv"><label>value</label><code id="enrich_conf">—</code></div><p class="why"><strong>Why:</strong> Match quality. <strong>Do:</strong> Gate routing/alerts.</p></div>
       </div>
       <div class="notice" style="margin-top:10px">
-        <strong>How we’d use this:</strong> Map Domain→Account; stamp firmographics on Lead/Contact; attach intent topics to Campaign Members; push account scoring & routing; populate SF reports.<br/>
         <a class="btn secondary" id="enrichToggleBtn" href="#">Toggle demo on/off</a>
       </div>
     </div>
@@ -248,7 +217,7 @@
   <!-- ENGAGEMENT -->
   <section class="section">
     <div class="section-title"><div><div class="kicker">Engagement</div><h2 class="h2">Are they actually engaging?</h2></div></div>
-    <div class="tiles cols-4" style="margin-top:10px">
+    <div class="tiles cols-4" style="margin-top:8px">
       <div class="tile"><h3>Time on Page</h3><div class="kv"><label>value</label><code id="timeOnPage">0s</code></div><p class="why"><strong>Why:</strong> Intent proxy. <strong>Do:</strong> Nudges, MQL scoring.</p></div>
       <div class="tile"><h3>Scroll Depth</h3><div class="kv"><label>value</label><code id="scrollDepth">0%</code></div><p class="why"><strong>Why:</strong> Content resonance. <strong>Do:</strong> Promote winners.</p></div>
       <div class="tile"><h3>Pageviews (session)</h3><div class="kv"><label>value</label><code id="pageviews">1</code></div><p class="why"><strong>Why:</strong> Research behavior. <strong>Do:</strong> Trigger SDR alerts.</p></div>
@@ -269,7 +238,7 @@
   <section class="section">
     <div class="section-title"><div><div class="kicker">Salesforce Preview</div><h2 class="h2">What this looks like inside Salesforce</h2></div></div>
 
-    <div class="sf-tabs card" style="margin-bottom:10px">
+    <div class="sf-tabs card" style="margin-bottom:8px">
       <button class="sf-tab active" data-tab="leadTab">Lead</button>
       <button class="sf-tab" data-tab="cmTab">Campaign Member</button>
       <button class="sf-tab" data-tab="oppTab">Opportunity</button>
@@ -297,7 +266,12 @@
             <div class="sf-field"><label>Lead Source Detail</label><div id="sfLeadSourceDetail">—</div></div>
             <div class="sf-field"><label>Click IDs</label><div id="sfClickIds">—</div></div>
             <div class="sf-field"><label>Device</label><div id="sfDevice">—</div></div>
-            <div class="sf-field"><label>Geo</label><div id="sfGeo">—</div></div>
+            <!-- Split GEO in Salesforce-style fields -->
+            <div class="sf-field"><label>IP Address</label><div id="sfIP">—</div></div>
+            <div class="sf-field"><label>City</label><div id="sfCity">—</div></div>
+            <div class="sf-field"><label>Region / State</label><div id="sfRegion">—</div></div>
+            <div class="sf-field"><label>Country</label><div id="sfCountry">—</div></div>
+            <div class="sf-field"><label>Org / ASN</label><div id="sfOrg">—</div></div>
             <div class="sf-field"><label>Created Date</label><div id="sfCreated">—</div></div>
             <div class="sf-field"><label>Owner</label><div>CRM Hacker (Queue)</div></div>
           </div>
@@ -325,7 +299,7 @@
             <div class="sf-field"><label>Account (ABM)</label><div id="sfAccount">—</div></div>
             <div class="sf-field" style="grid-column:span 2"><label>UTM/CIDs Snapshot</label><div id="sfCmUtms">—</div></div>
           </div>
-          <p class="sub" style="margin-top:6px">Multi-touch: each touch stored as a Campaign Member with UTMs/Click IDs; % credit allocated by model (FT/LT/Linear/W-shape).</p>
+          <p class="sub" style="margin-top:6px">Multi-touch: each touch stored as a Campaign Member; credit allocated by model (FT/LT/Linear/W-shape).</p>
         </div>
       </div>
     </div>
@@ -374,14 +348,8 @@
                 </table>
               </div>
             </div>
-            <div class="tile">
-              <h3>Revenue by Model</h3>
-              <canvas id="modelBar"></canvas>
-            </div>
-            <div class="tile">
-              <h3>Touches per Opp</h3>
-              <canvas id="touchDist"></canvas>
-            </div>
+            <div class="tile"><h3>Revenue by Model</h3><canvas id="modelBar"></canvas></div>
+            <div class="tile"><h3>Touches per Opp</h3><canvas id="touchDist"></canvas></div>
           </div>
           <div class="notice" style="margin-top:10px">
             <strong>ROI Formula:</strong> <code>(Attributed Revenue − Campaign Spend) ÷ Campaign Spend</code> → ROI%.<br/>
@@ -481,12 +449,16 @@ setInterval(()=>{const t=Math.round((Date.now()-sessionMetrics.start)/1000);sess
 /* ===== RENDERERS ===== */
 function renderAcq(params){
   SAFE.set("referrer",getReferrer()); SAFE.set("landingUrl",params.landingUrl||location.href);
+  SAFE.set("referrer_cap", getReferrer()); SAFE.set("landing_cap", params.landingUrl||location.href);
   ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","gclid","fbclid","msclkid","ttclid","li_fat_id"].forEach(k=>SAFE.set(k,params[k]||"—"));
   const group=campaignGrouping(params); SAFE.set("campaignGroup",group); try{updateSourceDonut(group)}catch(e){}
 }
-function renderDevice(d){ SAFE.set("deviceType",d.type); SAFE.set("os",d.os); SAFE.set("browser",d.browser); SAFE.set("screen",d.screen); SAFE.set("ua",d.ua);
-  SAFE.set("ua_cap",d.ua); }
-function renderGeo(g){ SAFE.set("ip",g.ip); SAFE.set("city",g.city); SAFE.set("region",g.region); SAFE.set("country",g.country); SAFE.set("org",g.org); }
+function renderDevice(d){ SAFE.set("deviceType",d.type); SAFE.set("os",d.os); SAFE.set("browser",d.browser); SAFE.set("screen",d.screen); SAFE.set("ua",d.ua); SAFE.set("ua_cap",d.ua); }
+function renderGeo(g){
+  SAFE.set("ip",g.ip); SAFE.set("city",g.city); SAFE.set("region",g.region); SAFE.set("country",g.country); SAFE.set("org",g.org);
+  // Also feed Salesforce split fields
+  SAFE.set("sfIP", g.ip||"—"); SAFE.set("sfCity", g.city||"—"); SAFE.set("sfRegion", g.region||"—"); SAFE.set("sfCountry", g.country||"—"); SAFE.set("sfOrg", g.org||"—");
+}
 function renderSession(){const elapsed=Math.round((Date.now()-sessionMetrics.start)/1000); SAFE.set("timeOnPage",`${elapsed}s`); SAFE.set("scrollDepth",`${sessionMetrics.scrollMax}%`); SAFE.set("pageviews",String(sessionMetrics.pageviews));}
 
 /* ===== CHARTS (wait for Chart.js) ===== */
@@ -510,9 +482,7 @@ function initCharts(){
 function updateSourceDonut(group){if(!sourceDonut)return;const map={'google-ads':0,'linkedin-ads':1,'email':2,'direct':3};const idx=map[group]??4;sourceDonut.data.datasets[0].data[idx]+=1;sourceDonut.update();}
 function updateDeviceBar(d){if(!deviceBar)return;const idx=(d.type==='Desktop'&&d.os==='Windows')?0:(d.type==='Desktop'&&d.os==='macOS')?1:(d.type==='Mobile'&&d.os==='iOS')?2:(d.type==='Mobile'&&d.os==='Android')?3:0;deviceBar.data.datasets[0].data=[0,0,0,0];deviceBar.data.datasets[0].data[idx]=1;deviceBar.update();}
 function updateEngageChart(){if(!engageLine)return;const last=sessionMetrics.timeline[sessionMetrics.timeline.length-1];if(!last)return;engageLine.data.labels.push(last.t);engageLine.data.datasets[0].data.push(last.depth);if(engageLine.data.labels.length>60){engageLine.data.labels.shift();engageLine.data.datasets[0].data.shift();}engageLine.update();}
-function waitForChart(timeoutMs=6000){
-  const start=Date.now();return new Promise((resolve)=>{(function poll(){if(window.Chart)return resolve(true);if(Date.now()-start>timeoutMs)return resolve(false);requestAnimationFrame(poll);})();});
-}
+function waitForChart(timeoutMs=6000){const start=Date.now();return new Promise((resolve)=>{(function poll(){if(window.Chart)return resolve(true);if(Date.now()-start>timeoutMs)return resolve(false);requestAnimationFrame(poll);})();});}
 
 /* ===== PDF ===== */
 async function downloadPDF(){
@@ -584,7 +554,6 @@ SAFE.on("enrichToggleBtn","click",(e)=>{
   try{
     const params=persistParams();
     const dev=deviceInfo(); renderAcq(params); renderDevice(dev);
-    SAFE.set("referrer_cap", getReferrer()); SAFE.set("landing_cap", params.landingUrl||location.href);
 
     let geo={}; try{ geo=await geoLookup(); renderGeo(geo); }catch(e){ SAFE.warn("geo failed",e.message); }
 
@@ -593,7 +562,7 @@ SAFE.on("enrichToggleBtn","click",(e)=>{
     // Enrichment
     let enrich=null; if(isDemoEnrich(params)){ enrich=simulateEnrichment(params,geo); renderEnrichment(enrich); }
 
-    // Salesforce preview
+    // Salesforce preview basics
     const name="Taylor Example", email="taylor@example.com";
     SAFE.set("sfLeadName",name); SAFE.set("sfLeadEmail",email);
     SAFE.set("sfLeadSource",campaignGrouping(params));
@@ -602,9 +571,7 @@ SAFE.on("enrichToggleBtn","click",(e)=>{
     const clickIds=["gclid","fbclid","msclkid","ttclid","li_fat_id"].filter(k=>params[k]).map(k=>`${k}=${params[k]}`).join("  •  ")||"(none)";
     SAFE.set("sfClickIds",clickIds);
     SAFE.set("sfDevice",`${dev.type} • ${dev.os} • ${dev.browser} • ${dev.screen}`);
-    const geoLine=[geo.city,geo.region,geo.country].filter(Boolean).join(", ");
-    SAFE.set("sfGeo",`${geo.ip||"—"} • ${geoLine||"—"}`); SAFE.set("sfCreated",new Date().toLocaleString());
-
+    SAFE.set("sfCreated",new Date().toLocaleString());
     if(enrich) applyEnrichmentToSalesforce(enrich);
 
     // Opportunity models
